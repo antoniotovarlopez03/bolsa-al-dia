@@ -2,7 +2,15 @@ import type { Pestana, SeccionSipri } from '../App';
 import type { Perfil } from '../datos/tipos';
 import { Cambio, Fuente } from '../componentes/Comunes';
 import { ResumenConvocados } from '../componentes/ResumenBolsa';
+import { Icono, type NombreIcono } from '../componentes/Iconos';
 import { type Datos, fechaCorta, fechaLarga, num, puestoDe, saludo, sumarPlazas, ultimaCon, ultimosDos } from '../utilidades';
+
+const ACCESOS: Array<[string, NombreIcono, SeccionSipri]> = [
+  ['Convocatorias', 'convocatoria', 'convocatorias'],
+  ['Adjudicaciones', 'adjudicacion', 'convocatorias'],
+  ['Estadísticas', 'estadisticas', 'estadisticas'],
+  ['Calendario', 'calendario', 'calendario'],
+];
 
 interface Props {
   perfil: Perfil;
@@ -19,7 +27,8 @@ export default function Inicio({ perfil, datos, irA }: Props) {
   return (
     <>
       <header className="cabecera">
-        <h1>{saludo()}{perfil.nombre ? `, ${perfil.nombre}` : ''} 👋</h1>
+        <h1>{saludo()}{perfil.nombre ? `, ${perfil.nombre}` : ''}</h1>
+        <p className="sub">Así están tus bolsas hoy.</p>
       </header>
 
       <section aria-labelledby="t-bolsas">
@@ -30,7 +39,7 @@ export default function Inicio({ perfil, datos, irA }: Props) {
           const real = ultimosDos(s.registros, 'situacionTiempoReal');
           const plazas = convPlazas && sumarPlazas(convPlazas.secciones.plazas?.filas, [puesto], s.provincias).plazas;
           return (
-            <article key={s.bolsaId} className="tarjeta">
+            <article key={s.bolsaId} className="tarjeta tarjeta-bolsa">
               <h3>{datos.bolsa(s.bolsaId)?.nombre ?? puesto}</h3>
               <div className="cifras">
                 <div>
@@ -74,8 +83,12 @@ export default function Inicio({ perfil, datos, irA }: Props) {
             ].filter(Boolean);
             return (
               <li key={c.id}>
-                <strong>Convocatoria del {fechaLarga(c.fecha)}</strong>
-                <span>{partes.join(' · ')}</span>
+                <span className="punto-icono"><Icono nombre={s.adjudicados ? 'adjudicacion' : 'convocatoria'} tam={18} /></span>
+                <div>
+                  <strong>Convocatoria del {fechaLarga(c.fecha)}</strong>
+                  <br />
+                  <span>{partes.join(' · ')}</span>
+                </div>
               </li>
             );
           })}
@@ -86,10 +99,12 @@ export default function Inicio({ perfil, datos, irA }: Props) {
       <section aria-labelledby="t-acc">
         <h2 id="t-acc">Accesos rápidos</h2>
         <div className="rejilla">
-          <button className="acceso" onClick={() => irA('sipri', 'convocatorias')}>📋<span>Convocatorias</span></button>
-          <button className="acceso" onClick={() => irA('sipri', 'convocatorias')}>✅<span>Adjudicaciones</span></button>
-          <button className="acceso" onClick={() => irA('sipri', 'estadisticas')}>📊<span>Estadísticas</span></button>
-          <button className="acceso" onClick={() => irA('sipri', 'calendario')}>📅<span>Calendario</span></button>
+          {ACCESOS.map(([texto, icono, s]) => (
+            <button key={texto} className="acceso" onClick={() => irA('sipri', s)}>
+              <span className="punto-icono"><Icono nombre={icono} /></span>
+              {texto}
+            </button>
+          ))}
         </div>
       </section>
     </>

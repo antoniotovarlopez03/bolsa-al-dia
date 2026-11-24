@@ -61,7 +61,7 @@ export default function Mas({ perfil, catalogo, setPerfil, editarPerfil }: Props
 
       <section className="tarjeta">
         <h2>Privacidad</h2>
-        <ul className="lista-check">
+        <ul className="lista-check puntos">
           <li>No hay cuentas ni registro.</li>
           <li>Tus datos (especialidades, provincias y números) se guardan <strong>solo en este dispositivo</strong>.</li>
           <li>Nunca pedimos contraseñas, certificados, DNI ni NIF.</li>

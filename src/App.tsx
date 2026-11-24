@@ -9,16 +9,17 @@ import Inicio from './pantallas/Inicio';
 import MisBolsas from './pantallas/MisBolsas';
 import Sipri from './pantallas/Sipri';
 import Mas from './pantallas/Mas';
-import { EstadoDatos } from './componentes/Comunes';
+import { BarraSuperior, EstadoDatos } from './componentes/Comunes';
+import { Icono, type NombreIcono } from './componentes/Iconos';
 
 export type Pestana = 'inicio' | 'bolsas' | 'sipri' | 'mas';
 export type SeccionSipri = 'convocatorias' | 'estadisticas' | 'calendario';
 
-const PESTANAS: Array<{ id: Pestana; texto: string; icono: string }> = [
-  { id: 'inicio', texto: 'Inicio', icono: '🏠' },
-  { id: 'bolsas', texto: 'Mis bolsas', icono: '📈' },
-  { id: 'sipri', texto: 'SIPRI', icono: '📋' },
-  { id: 'mas', texto: 'Más', icono: '⚙️' },
+const PESTANAS: Array<{ id: Pestana; texto: string; icono: NombreIcono }> = [
+  { id: 'inicio', texto: 'Inicio', icono: 'inicio' },
+  { id: 'bolsas', texto: 'Mis bolsas', icono: 'bolsas' },
+  { id: 'sipri', texto: 'SIPRI', icono: 'sipri' },
+  { id: 'mas', texto: 'Más', icono: 'mas' },
 ];
 
 export default function App() {
@@ -68,6 +69,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <BarraSuperior />
       <EstadoDatos carga={carga} />
       <main className="contenido">
         {datos ? (
@@ -89,7 +91,7 @@ export default function App() {
             aria-current={pestana === p.id ? 'page' : undefined}
             onClick={() => irA(p.id)}
           >
-            <span aria-hidden="true">{p.icono}</span>
+            <span className="pastilla"><Icono nombre={p.icono} /></span>
             {p.texto}
           </button>
         ))}

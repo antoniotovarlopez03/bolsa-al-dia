@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import { nombreCuerpo } from '../datos/catalogo';
 import { PROVINCIAS_AND, type Bolsa, type BolsaSeguida, type Perfil, type Provincia } from '../datos/tipos';
 import { hoyISO, normalizar } from '../utilidades';
+import { Icono } from '../componentes/Iconos';
+import { BarraSuperior } from '../componentes/Comunes';
 
 interface Props {
   catalogo: Bolsa[];
@@ -48,6 +50,7 @@ export default function Bienvenida({ catalogo, cargando, perfilInicial, onTermin
 
   return (
     <div className="app bienvenida">
+      <BarraSuperior />
       <main className="contenido">
         <p className="pasos">Paso {paso} de 3</p>
 
@@ -56,9 +59,9 @@ export default function Bienvenida({ catalogo, cargando, perfilInicial, onTermin
             <h1>Bienvenida a Bolsa al Día</h1>
             <p className="grande">Sigue tus bolsas docentes de Andalucía de forma sencilla.</p>
             <ul className="lista-check">
-              <li>✔ Gratis, sin anuncios y sin registro.</li>
-              <li>✔ Tus datos se quedan <strong>solo en este dispositivo</strong>.</li>
-              <li>✔ Nunca te pediremos tu contraseña de SIPRI.</li>
+              <li><Icono nombre="check" tam={20} /> Gratis, sin anuncios y sin registro.</li>
+              <li><Icono nombre="check" tam={20} /> <span>Tus datos se quedan <strong>solo en este dispositivo</strong>.</span></li>
+              <li><Icono nombre="check" tam={20} /> Nunca te pediremos tu contraseña de SIPRI.</li>
             </ul>
             <p className="nota">Herramienta independiente. No pertenece a la Junta de Andalucía.</p>
             <label className="campo">

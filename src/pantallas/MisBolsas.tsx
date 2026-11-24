@@ -4,6 +4,7 @@ import type { BolsaSeguida, Disponibilidad, Perfil } from '../datos/tipos';
 import { Ayuda, Cambio, Fuente, TEXTO_CONVOCADO, TEXTO_ORDEN, TEXTO_RANGO, TEXTO_TIEMPO_REAL } from '../componentes/Comunes';
 import { GraficaLinea } from '../componentes/Graficas';
 import { ResumenConvocados } from '../componentes/ResumenBolsa';
+import { Icono } from '../componentes/Iconos';
 import { type Datos, fechaCorta, hoyISO, num, puestoDe, sumarPlazas, ultimaCon, ultimosDos } from '../utilidades';
 
 const DISPONIBILIDAD: Record<Disponibilidad, string> = {
@@ -134,7 +135,7 @@ function DetalleBolsa({ s, datos, actualizar }: { s: BolsaSeguida; datos: Datos;
                     <td>{num(r.ordenEnBolsa)}</td>
                     <td>{num(r.situacionTiempoReal)}</td>
                     <td><Cambio actual={r.situacionTiempoReal} anterior={prev?.situacionTiempoReal} /></td>
-                    <td><button className="enlace" aria-label={`Borrar registro del ${fechaCorta(r.fecha)}`} onClick={() => borrarRegistro(r.fecha)}>✕</button></td>
+                    <td><button className="icono-boton" aria-label={`Borrar registro del ${fechaCorta(r.fecha)}`} onClick={() => borrarRegistro(r.fecha)}><Icono nombre="cerrar" tam={18} /></button></td>
                   </tr>
                 );
               })}

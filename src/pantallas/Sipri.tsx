@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import type { SeccionSipri } from '../App';
 import type { Convocatoria, FilaPlazas, Perfil } from '../datos/tipos';
-import { Fuente } from '../componentes/Comunes';
+import { Aviso, Fuente } from '../componentes/Comunes';
+import { Icono } from '../componentes/Iconos';
 import { GraficaBarras } from '../componentes/Graficas';
 import {
   type Datos, type EventoCalendario, descargarICS, fechaLarga, hoyISO, num, puestoDe, sumarPlazas,
@@ -61,7 +62,7 @@ function Convocatorias({ perfil, datos }: { perfil: Perfil; datos: Datos }) {
               <strong>Convocatoria del {fechaLarga(c.fecha)}</strong>
               <small>{resumenLinea(c, puestos, prov)}</small>
             </span>
-            <span aria-hidden="true">{abierta === c.id ? '▲' : '▼'}</span>
+            <Icono nombre="abajo" />
           </button>
           {abierta === c.id && <DetalleConvocatoria c={c} datos={datos} puestos={puestos} prov={prov} />}
         </article>
@@ -147,9 +148,9 @@ function Estadisticas({ perfil, datos }: { perfil: Perfil; datos: Datos }) {
   return (
     <>
       {conPlazas.length + conConv.length < 4 && (
-        <p className="aviso-prevision">
-          ℹ️ Aún hay pocos datos: el robot empezó a guardar convocatorias el 24-11-2026. Las estadísticas mejorarán cada semana.
-        </p>
+        <Aviso tipo="info">
+          Aún hay pocos datos: el robot empezó a guardar convocatorias el 24-11-2026. Las estadísticas mejorarán cada semana.
+        </Aviso>
       )}
       {perfil.bolsas.map((s) => {
         const p = puestoDe(s.bolsaId);
@@ -168,9 +169,9 @@ function Estadisticas({ perfil, datos }: { perfil: Perfil; datos: Datos }) {
                 <span className="valor">{plazas.length ? (total / plazas.length).toLocaleString('es-ES', { maximumFractionDigits: 1 }) : '—'}</span>
               </div>
             </div>
-            <p className="aviso-prevision">
-              ⚠️ Estas cifras describen lo ocurrido. <strong>No son una previsión oficial</strong> ni indican cuándo te llamarán.
-            </p>
+            <Aviso>
+              Estas cifras describen lo ocurrido. <strong>No son una previsión oficial</strong> ni indican cuándo te llamarán.
+            </Aviso>
             <Fuente />
           </section>
         );
@@ -198,18 +199,21 @@ function Calendario({ datos }: { datos: Datos }) {
         <h2>Próximas fechas habituales</h2>
         <ul className="eventos">
           {proximos.map((e) => (
-            <li key={e.fecha}><span className="ev-icono" aria-hidden="true">📋</span><span><strong>{fechaLarga(e.fecha)}</strong><br />{e.titulo}</span></li>
+            <li key={e.fecha}>
+              <span className="punto-icono"><Icono nombre="calendario" tam={18} /></span>
+              <span><strong>{fechaLarga(e.fecha)}</strong><br />{e.titulo}</span>
+            </li>
           ))}
         </ul>
         <p className="nota">SIPRI suele convocar los martes y los jueves. No son fechas oficiales: confirma siempre en SIPRI.</p>
-        <button className="boton" onClick={() => descargarICS(proximos)}>📅 Añadir a mi calendario</button>
+        <button className="boton" onClick={() => descargarICS(proximos)}><Icono nombre="descargar" tam={20} /> Añadir a mi calendario</button>
       </section>
       <section className="tarjeta">
         <h2>Convocatorias publicadas</h2>
         <ul className="eventos">
           {pasadas.map((c) => (
             <li key={c.id}>
-              <span className="ev-icono" aria-hidden="true">{c.totales.adjudicados !== null ? '✅' : '📋'}</span>
+              <span className="punto-icono"><Icono nombre={c.totales.adjudicados !== null ? 'adjudicacion' : 'convocatoria'} tam={18} /></span>
               <span>
                 <strong>{fechaLarga(c.fecha)}</strong>
                 <br />
