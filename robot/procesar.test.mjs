@@ -2,7 +2,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  comprobarSinDatosPersonales, fechaDeTitulo, mismaSeccion, resumirConvocados, resumirPlazas, separarPuesto, titulosConvocatoria,
+  comprobarSinDatosPersonales, fechaDeTitulo, mismaSeccion, puestosDelDesplegable, resumirConvocados, resumirPlazas, separarPuesto,
+  titulosConvocatoria,
 } from './procesar.mjs';
 
 test('extrae la fecha del título de la convocatoria', () => {
@@ -14,6 +15,11 @@ test('extrae la fecha del título de la convocatoria', () => {
 test('encuentra los títulos en el HTML', () => {
   const html = '<h3>Personal convocado</h3><a>CONVOCATORIA DE PROVISIÓN DE VACANTES Y SUSTITUCIONES DE\n 19 DE NOVIEMBRE DE 2026</a>';
   assert.equal(titulosConvocatoria(html).length, 1);
+});
+
+test('lee las especialidades del desplegable', () => {
+  const html = '<select id="puesto"><option value="">Seleccionar puesto...</option><option value="00597038">00597038 - EDUCACIÓN PRIMARIA</option><option value="11590006" >MATEMATICAS (INGLES) P.E.S.</option></select>';
+  assert.deepEqual(puestosDelDesplegable(html), { '00597038': 'EDUCACIÓN PRIMARIA', '11590006': 'MATEMATICAS (INGLES) P.E.S.' });
 });
 
 test('separa código y nombre del puesto', () => {

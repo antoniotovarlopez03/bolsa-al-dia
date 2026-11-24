@@ -8,8 +8,12 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import {
-  comprobarSinDatosPersonales, fechaDeTitulo, mismaSeccion, resumirConvocados, resumirPlazas, titulosConvocatoria,
+  comprobarSinDatosPersonales, fechaDeTitulo, mismaSeccion, puestosDelDesplegable, resumirConvocados, resumirPlazas,
+  titulosConvocatoria,
 } from './procesar.mjs';
+
+/** Catálogo de especialidades visto en los desplegables oficiales (se rellena al leer). */
+const puestosDesplegables = {};
 
 const BASE = 'https://sipri.juntadeandalucia.es/sipri/';
 const UA = 'Mozilla/5.0 (compatible; BolsaAlDia-robot/0.1; herramienta informativa gratuita y sin anuncios)';
@@ -47,6 +51,7 @@ async function leerListado(l) {
   const r = await pedir(BASE + l.pagina);
   const cookie = (r.headers.getSetCookie?.() ?? []).map((c) => c.split(';')[0]).join('; ');
   const html = await r.text();
+  Object.assign(puestosDesplegables, puestosDelDesplegable(html));
   const titulos = titulosConvocatoria(html);
   if (!titulos.length) {
     if (/No hay (lista|convocatorias?)[^<]*publicad/i.test(html)) return [];
@@ -129,9 +134,15 @@ async function main() {
     indice.convocatorias = [...indice.convocatorias.filter((c) => c.id !== doc.id), entrada].sort((a, b) => a.fecha.localeCompare(b.fecha));
   }
 
-  if (cambiadas.size) {
+  const antes = JSON.stringify(indice.puestos ?? {});
+  const nuevosPuestos = Object.fromEntries(
+    Object.entries({ ...puestos, ...puestosDesplegables })
+      .filter(([c]) => /^[0-9A-Z]{8}$/.test(c))
+      .sort(([a], [b]) => a.localeCompare(b)),
+  );
+  if (cambiadas.size || JSON.stringify(nuevosPuestos) !== antes) {
     indice.actualizado = ahora;
-    indice.puestos = Object.fromEntries(Object.entries(puestos).sort(([a], [b]) => a.localeCompare(b)));
+    indice.puestos = nuevosPuestos;
     comprobarSinDatosPersonales(indice);
     await writeFile(rutaIndice, JSON.stringify(indice, null, 1) + '\n');
   }

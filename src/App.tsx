@@ -1,13 +1,15 @@
 import { useMemo, useState } from 'react';
 import { cargarPerfil, guardarPerfil } from './almacen';
-import { crearDatosEjemplo } from './datos/ejemplo';
+import { useDatosPublicos } from './datos/cargar';
+import { crearCatalogo } from './datos/catalogo';
 import type { Perfil } from './datos/tipos';
+import type { Datos } from './utilidades';
 import Bienvenida from './pantallas/Bienvenida';
 import Inicio from './pantallas/Inicio';
 import MisBolsas from './pantallas/MisBolsas';
 import Sipri from './pantallas/Sipri';
 import Mas from './pantallas/Mas';
-import { AvisoEjemplo } from './componentes/Comunes';
+import { EstadoDatos } from './componentes/Comunes';
 
 export type Pestana = 'inicio' | 'bolsas' | 'sipri' | 'mas';
 export type SeccionSipri = 'convocatorias' | 'estadisticas' | 'calendario';
@@ -24,8 +26,19 @@ export default function App() {
   const [pestana, setPestana] = useState<Pestana>('inicio');
   const [seccion, setSeccion] = useState<SeccionSipri>('convocatorias');
   const [editando, setEditando] = useState(false);
-  // Fase 3: solo datos de ejemplo. En la Fase 4 se cargarán los JSON reales del robot.
-  const datos = useMemo(() => crearDatosEjemplo(), []);
+  const carga = useDatosPublicos();
+
+  const indice = carga.tipo === 'listo' ? carga.indice : undefined;
+  const catalogo = useMemo(() => crearCatalogo(indice?.puestos), [indice]);
+  const datos: Datos | null = useMemo(() => {
+    if (carga.tipo !== 'listo') return null;
+    return {
+      indice: carga.indice,
+      convocatorias: [...carga.convocatorias].sort((a, b) => a.fecha.localeCompare(b.fecha)),
+      catalogo,
+      bolsa: (id) => catalogo.find((b) => b.id === id),
+    };
+  }, [carga, catalogo]);
 
   const setPerfil = (p: Perfil | null) => {
     setPerfilEstado(p);
@@ -41,6 +54,8 @@ export default function App() {
   if (!perfil || editando) {
     return (
       <Bienvenida
+        catalogo={catalogo}
+        cargando={carga.tipo === 'cargando'}
         perfilInicial={perfil}
         onTerminar={(p) => {
           setPerfil(p);
@@ -53,14 +68,20 @@ export default function App() {
 
   return (
     <div className="app">
-      {datos.esEjemplo && <AvisoEjemplo />}
+      <EstadoDatos carga={carga} />
       <main className="contenido">
-        {pestana === 'inicio' && <Inicio perfil={perfil} datos={datos} irA={irA} />}
-        {pestana === 'bolsas' && <MisBolsas perfil={perfil} datos={datos} setPerfil={setPerfil} />}
-        {pestana === 'sipri' && <Sipri perfil={perfil} datos={datos} seccion={seccion} setSeccion={setSeccion} />}
-        {pestana === 'mas' && <Mas perfil={perfil} setPerfil={setPerfil} editarPerfil={() => setEditando(true)} />}
+        {datos ? (
+          <>
+            {pestana === 'inicio' && <Inicio perfil={perfil} datos={datos} irA={irA} />}
+            {pestana === 'bolsas' && <MisBolsas perfil={perfil} datos={datos} setPerfil={setPerfil} />}
+            {pestana === 'sipri' && <Sipri perfil={perfil} datos={datos} seccion={seccion} setSeccion={setSeccion} />}
+          </>
+        ) : (
+          pestana !== 'mas' && <p className="vacio">{carga.tipo === 'cargando' ? 'Cargando datos de SIPRI…' : 'Sin datos disponibles.'}</p>
+        )}
+        {pestana === 'mas' && <Mas perfil={perfil} catalogo={catalogo} setPerfil={setPerfil} editarPerfil={() => setEditando(true)} />}
       </main>
-      <nav className="navegacion"aria-label="Navegación principal">
+      <nav className="navegacion" aria-label="Navegación principal">
         {PESTANAS.map((p) => (
           <button
             key={p.id}

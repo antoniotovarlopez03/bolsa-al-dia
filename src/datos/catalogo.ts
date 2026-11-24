@@ -1,38 +1,60 @@
 import type { Bolsa } from './tipos';
 
-// Catálogo inicial de bolsas de Andalucía.
-// Los códigos siguen el formato de "Puesto" del desplegable de SIPRI (8 cifras).
-// Verificados en SIPRI (24-11-2026): 00597038, 00590011, 00597037.
-// El resto: PENDIENTE DE VERIFICAR contra el desplegable oficial antes de la Fase 4.
-const lista: Array<[string, string, string]> = [
-  ['597', '00597031', 'Educación Infantil (Maestros)'],
-  ['597', '00597038', 'Educación Primaria (Maestros)'],
-  ['597', '00597032', 'Inglés (Maestros)'],
-  ['597', '00597033', 'Francés (Maestros)'],
-  ['597', '00597034', 'Educación Física (Maestros)'],
-  ['597', '00597035', 'Música (Maestros)'],
-  ['597', '00597036', 'Pedagogía Terapéutica (Maestros)'],
-  ['597', '00597037', 'Audición y Lenguaje (Maestros)'],
-  ['590', '00590001', 'Filosofía (Secundaria)'],
-  ['590', '00590004', 'Lengua Castellana y Literatura (Secundaria)'],
-  ['590', '00590005', 'Geografía e Historia (Secundaria)'],
-  ['590', '00590006', 'Matemáticas (Secundaria)'],
-  ['590', '00590007', 'Física y Química (Secundaria)'],
-  ['590', '00590008', 'Biología y Geología (Secundaria)'],
-  ['590', '00590011', 'Inglés (Secundaria)'],
-  ['590', '00590018', 'Orientación Educativa (Secundaria)'],
-];
+export const URL_SIPRI = 'https://sipri.juntadeandalucia.es/sipri/';
 
-export const CATALOGO: Bolsa[] = lista.map(([cuerpo, puesto, nombre]) => ({
-  id: `AND-${puesto}`,
-  comunidad: 'AND',
-  cuerpo,
-  puesto,
-  nombre,
-}));
+// Cuerpos docentes (3 cifras centrales del código de puesto).
+export const CUERPOS: Record<string, string> = {
+  '597': 'Maestros',
+  '590': 'Secundaria',
+  '591': 'Profesores Técnicos de FP',
+  '598': 'Especialistas de FP',
+  '592': 'Escuelas Oficiales de Idiomas',
+  '594': 'Música y Artes Escénicas',
+  '593': 'Catedráticos de Música y AA. EE.',
+  '595': 'Artes Plásticas y Diseño',
+  '596': 'Maestros de Taller de AA. PP.',
+};
 
-export function buscarBolsa(id: string): Bolsa | undefined {
-  return CATALOGO.find((b) => b.id === id);
+/** "INGLES P.E.S." → "Ingles P.E.S." (mantiene siglas con puntos). */
+export function nombreLegible(oficial: string): string {
+  const t = oficial
+    .split(/(\s+)/)
+    // Siglas tipo "P.E.S." o "C.M.A.E." se mantienen; el resto pasa a minúsculas.
+    .map((p) => (/^\(?(\p{L}\.){2,}\)?,?$/u.test(p) ? p : p.toLowerCase()))
+    .join('');
+  return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
-export const URL_SIPRI = 'https://sipri.juntadeandalucia.es/sipri/';
+export function crearBolsa(puesto: string, oficial: string): Bolsa {
+  return {
+    id: `AND-${puesto}`,
+    comunidad: 'AND',
+    cuerpo: puesto.slice(2, 5),
+    puesto,
+    nombre: nombreLegible(oficial),
+    nombreOficial: oficial,
+  };
+}
+
+// Lista mínima por si la app arranca sin conexión la primera vez (códigos verificados en SIPRI).
+const RESPALDO: Record<string, string> = {
+  '00597031': 'EDUCACIÓN INFANTIL',
+  '00597038': 'EDUCACIÓN PRIMARIA',
+  '00597032': 'INGLÉS',
+  '00597034': 'EDUCACIÓN FÍSICA',
+  '00597035': 'MÚSICA',
+  '00597036': 'PEDAGOGÍA TERAPÉUTICA',
+  '00597037': 'AUDICIÓN Y LENGUAJE',
+  '00590011': 'INGLES P.E.S.',
+};
+
+/** Catálogo completo: lo que publica el robot (índice) + respaldo. */
+export function crearCatalogo(puestos?: Record<string, string>): Bolsa[] {
+  return Object.entries({ ...RESPALDO, ...(puestos ?? {}) })
+    .map(([p, n]) => crearBolsa(p, n))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+}
+
+export function nombreCuerpo(cuerpo: string) {
+  return CUERPOS[cuerpo] ?? `Cuerpo ${cuerpo}`;
+}

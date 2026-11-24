@@ -49,11 +49,23 @@ button { font: inherit; cursor: pointer; }
 .contenido { max-width: 640px; margin: 0 auto; padding: 16px 16px 110px; }
 .bienvenida .contenido { padding-bottom: 40px; }
 
-.aviso-ejemplo {
-  background: var(--aviso); border-bottom: 2px solid var(--aviso-borde);
-  padding: 8px 16px; text-align: center; font-size: .9rem;
-  position: sticky; top: 0; z-index: 5;
+.franja {
+  background: var(--primario-claro); color: var(--suave);
+  padding: 6px 16px; text-align: center; font-size: .85rem;
 }
+.franja.aviso { background: var(--aviso); color: var(--texto); border-bottom: 2px solid var(--aviso-borde); font-size: .9rem; }
+
+.grupo { border: 0; padding: 0; margin: 16px 0 0; }
+.grupo legend { font-weight: 700; color: var(--primario); padding: 0; margin-bottom: 4px; }
+.botones.fijos {
+  position: sticky; bottom: 0; background: var(--fondo);
+  padding: 8px 0 calc(8px + env(safe-area-inset-bottom)); border-top: 1px solid var(--borde);
+}
+.dato-publico { border-left: 4px solid var(--acento); padding: 4px 0 4px 12px; margin: 12px 0; }
+.dato-publico p { margin: 4px 0; }
+.comparacion { font-weight: 600; }
+.tabla-scroll { overflow-x: auto; }
+.detalle h3 { margin-top: 16px; font-size: 1rem; }
 
 .cabecera { margin: 8px 0 16px; }
 .sub, .nota, .fuente { color: var(--suave); font-size: .9rem; }

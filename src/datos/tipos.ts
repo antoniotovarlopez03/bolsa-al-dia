@@ -8,14 +8,17 @@ export const PROVINCIAS_AND = [
 ] as const;
 export type Provincia = (typeof PROVINCIAS_AND)[number];
 
-/** Una bolsa = cuerpo + especialidad ("puesto" en SIPRI, p. ej. 00597038). */
+/** Una bolsa = especialidad ("puesto" en SIPRI, código de 8 caracteres, p. ej. 00597038). */
 export interface Bolsa {
   id: string; // `${comunidad}-${puesto}`
   comunidad: CodigoComunidad;
   cuerpo: string; // '590', '597'...
-  puesto: string; // código de puesto de SIPRI
-  nombre: string;
+  puesto: string;
+  nombre: string; // nombre legible
+  nombreOficial: string; // tal cual lo publica SIPRI
 }
+
+// ───────── Datos del docente (solo en su dispositivo) ─────────
 
 /** Lo que el docente apunta a mano, copiado de su consulta personal en SIPRI. */
 export interface RegistroPosicion {
@@ -43,39 +46,49 @@ export interface Perfil {
   creado: string;
 }
 
-/** Resumen público y SIN nombres de una convocatoria, por bolsa y provincia. */
-export interface ResumenConvocatoria {
-  bolsaId: string;
-  provincia: Provincia;
-  plazasOfertadas: number;
-  plazasAdjudicadas: number;
-  plazasNoCubiertas: number;
-  /** Solo si SIPRI lo publica (pendiente de verificar). */
-  ultimoOrdenConvocado?: number;
+// ───────── Datos públicos generados por el robot (robot/sipri.mjs) ─────────
+
+export interface ResumenConvocados {
+  convocados: number;
+  /** Menor y mayor número de orden en bolsa entre las personas convocadas. */
+  ordenMin: number | null;
+  ordenMax: number | null;
 }
+
+export interface FilaPlazas {
+  puesto: string;
+  provincia: string;
+  plazas: number;
+  porTipo: Record<string, number>; // Sustitución / Vacante
+  porParticipacion: Record<string, number>; // O = obligatoria, V = voluntaria…
+}
+
+interface SeccionBase { leido: string; total: number }
 
 export interface Convocatoria {
   id: string;
   comunidad: CodigoComunidad;
-  titulo: string;
-  fechaConvocatoria: string;
-  fechaAdjudicacion?: string;
-  fechaIncorporacion?: string;
-  resumen: ResumenConvocatoria[];
-  fuente: string; // URL oficial
-  esEjemplo: boolean; // true = DATOS DE EJEMPLO
-}
-
-export interface EventoCalendario {
   fecha: string;
   titulo: string;
-  tipo: 'convocatoria' | 'adjudicacion' | 'incorporacion' | 'plazo' | 'otro';
-  esEjemplo: boolean;
+  fuente: string;
+  secciones: {
+    convocados?: SeccionBase & { porPuesto: Record<string, ResumenConvocados> };
+    plazas?: SeccionBase & { filas: FilaPlazas[] };
+    adjudicados?: SeccionBase & { filas: FilaPlazas[] };
+    noCubiertas?: SeccionBase & { filas: FilaPlazas[] };
+  };
 }
 
-export interface PaqueteDatos {
-  actualizado: string; // fecha-hora ISO de la última lectura
-  esEjemplo: boolean;
-  convocatorias: Convocatoria[];
-  eventos: EventoCalendario[];
+export interface EntradaIndice {
+  id: string;
+  fecha: string;
+  totales: { convocados: number | null; plazas: number | null; adjudicados: number | null; noCubiertas: number | null };
+}
+
+export interface Indice {
+  comunidad: CodigoComunidad;
+  fuente: string;
+  actualizado: string;
+  convocatorias: EntradaIndice[];
+  puestos: Record<string, string>;
 }

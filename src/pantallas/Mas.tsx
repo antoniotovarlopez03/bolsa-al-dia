@@ -1,15 +1,17 @@
 import { useRef, useState } from 'react';
 import { borrarTodo, exportarPerfil, importarPerfil } from '../almacen';
-import { buscarBolsa, URL_SIPRI } from '../datos/catalogo';
-import type { Perfil } from '../datos/tipos';
+import { URL_SIPRI } from '../datos/catalogo';
+import type { Bolsa, Perfil } from '../datos/tipos';
 
 interface Props {
   perfil: Perfil;
+  catalogo: Bolsa[];
   setPerfil: (p: Perfil | null) => void;
   editarPerfil: () => void;
 }
 
-export default function Mas({ perfil, setPerfil, editarPerfil }: Props) {
+export default function Mas({ perfil, catalogo, setPerfil, editarPerfil }: Props) {
+  const buscarBolsa = (id: string) => catalogo.find((b) => b.id === id);
   const archivo = useRef<HTMLInputElement>(null);
   const [mensaje, setMensaje] = useState('');
 
@@ -79,7 +81,12 @@ export default function Mas({ perfil, setPerfil, editarPerfil }: Props) {
           Fuente de los datos públicos: <a href={URL_SIPRI} target="_blank" rel="noopener noreferrer">sipri.juntadeandalucia.es</a> (Consejería de Desarrollo Educativo y F.P., Junta de Andalucía).
         </p>
         <p className="nota">Gratis para siempre: sin anuncios, sin suscripciones y sin compras.</p>
-        <p className="nota">Versión 0.1 · prototipo</p>
+        <p className="nota">
+          Cómo se obtienen los datos: un programa automático lee los listados públicos de SIPRI (convocados, plazas,
+          adjudicados y plazas no cubiertas) unas pocas veces al día laborable. Descarta nombres y NIF al leerlos y guarda
+          solo cifras por especialidad y provincia. Tu posición personal no es pública: la apuntas tú.
+        </p>
+        <p className="nota">Versión 0.2</p>
       </section>
     </>
   );

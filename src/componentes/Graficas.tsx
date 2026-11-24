@@ -3,9 +3,9 @@ import { fechaCorta } from '../utilidades';
 
 interface Punto { etiqueta: string; valor: number }
 
-export function GraficaLinea({ puntos, titulo, invertida = true }: { puntos: Punto[]; titulo: string; invertida?: boolean }) {
+export function GraficaLinea({ puntos, titulo, invertida = true, textoVacio }: { puntos: Punto[]; titulo: string; invertida?: boolean; textoVacio?: string }) {
   if (puntos.length < 2)
-    return <p className="vacio">Apunta tu número al menos dos días distintos para ver la gráfica.</p>;
+    return <p className="vacio">{textoVacio ?? 'Apunta tu número al menos dos días distintos para ver la gráfica.'}</p>;
   const W = 320, H = 160, M = { i: 44, d: 12, a: 12, b: 28 };
   const vals = puntos.map((p) => p.valor);
   const min = Math.min(...vals), max = Math.max(...vals);

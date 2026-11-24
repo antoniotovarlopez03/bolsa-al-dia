@@ -8,6 +8,20 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icono.svg'],
+      workbox: {
+        // Datos de SIPRI: se pide la versión nueva y, si no hay conexión, se usa la última guardada.
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/datos/'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'datos-sipri',
+              networkTimeoutSeconds: 5,
+              expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 * 90 },
+            },
+          },
+        ],
+      },
       manifest: {
         name: 'Bolsa al Día',
         short_name: 'Bolsa al Día',

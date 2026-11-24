@@ -1,39 +1,37 @@
 import type { Pestana, SeccionSipri } from '../App';
-import { buscarBolsa } from '../datos/catalogo';
-import type { PaqueteDatos, Perfil } from '../datos/tipos';
+import type { Perfil } from '../datos/tipos';
 import { Cambio, Fuente } from '../componentes/Comunes';
-import { fechaCorta, fechaLarga, num, saludo, totales, ultimosDos } from '../utilidades';
+import { ResumenConvocados } from '../componentes/ResumenBolsa';
+import { type Datos, fechaCorta, fechaLarga, num, puestoDe, saludo, sumarPlazas, ultimaCon, ultimosDos } from '../utilidades';
 
 interface Props {
   perfil: Perfil;
-  datos: PaqueteDatos;
+  datos: Datos;
   irA: (p: Pestana, s?: SeccionSipri) => void;
 }
 
 export default function Inicio({ perfil, datos, irA }: Props) {
-  const ultima = datos.convocatorias.at(-1);
-  const misIds = perfil.bolsas.map((b) => b.bolsaId);
+  const convConvocados = ultimaCon(datos.convocatorias, 'convocados');
+  const convPlazas = ultimaCon(datos.convocatorias, 'plazas');
+  const misPuestos = perfil.bolsas.map((b) => puestoDe(b.bolsaId));
   const misProv = perfil.bolsas[0]?.provincias ?? [];
 
   return (
     <>
       <header className="cabecera">
         <h1>{saludo()}{perfil.nombre ? `, ${perfil.nombre}` : ''} 👋</h1>
-        <p className="sub">
-          {datos.esEjemplo ? 'Datos de ejemplo (aún sin conexión con SIPRI)' : `Datos de SIPRI actualizados: ${fechaLarga(datos.actualizado.slice(0, 10))}`}
-        </p>
       </header>
 
       <section aria-labelledby="t-bolsas">
         <h2 id="t-bolsas">Mis bolsas</h2>
         {perfil.bolsas.map((s) => {
-          const b = buscarBolsa(s.bolsaId);
+          const puesto = puestoDe(s.bolsaId);
           const orden = ultimosDos(s.registros, 'ordenEnBolsa');
           const real = ultimosDos(s.registros, 'situacionTiempoReal');
-          const plazas = ultima ? totales(ultima, [s.bolsaId], s.provincias) : undefined;
+          const plazas = convPlazas && sumarPlazas(convPlazas.secciones.plazas?.filas, [puesto], s.provincias).plazas;
           return (
             <article key={s.bolsaId} className="tarjeta">
-              <h3>{b?.nombre ?? s.bolsaId}</h3>
+              <h3>{datos.bolsa(s.bolsaId)?.nombre ?? puesto}</h3>
               <div className="cifras">
                 <div>
                   <span className="etq">Orden en bolsa</span>
@@ -45,10 +43,13 @@ export default function Inicio({ perfil, datos, irA }: Props) {
                   <Cambio actual={real.actual?.situacionTiempoReal} anterior={real.anterior?.situacionTiempoReal} />
                 </div>
               </div>
-              {real.actual && <p className="nota">Apuntado por ti el {fechaCorta(real.actual.fecha)}</p>}
-              {plazas && (
+              {(orden.actual || real.actual) && (
+                <p className="nota">Apuntado por ti el {fechaCorta((real.actual ?? orden.actual)!.fecha)}</p>
+              )}
+              <ResumenConvocados conv={convConvocados} puesto={puesto} miOrden={orden.actual?.ordenEnBolsa} />
+              {convPlazas && (
                 <p className="linea-dato">
-                  Última convocatoria en tus provincias: <strong>{plazas.ofertadas} plazas</strong>
+                  Plazas en tus provincias (convocatoria del {fechaCorta(convPlazas.fecha)}): <strong>{plazas}</strong>
                 </p>
               )}
               <button className="boton" onClick={() => irA('bolsas')}>
@@ -62,17 +63,24 @@ export default function Inicio({ perfil, datos, irA }: Props) {
       <section aria-labelledby="t-nov">
         <h2 id="t-nov">Últimas novedades de SIPRI</h2>
         <ul className="novedades">
-          {datos.convocatorias.slice(-3).reverse().map((c) => {
-            const t = totales(c, misIds, misProv);
+          {datos.convocatorias.slice(-4).reverse().map((c) => {
+            const s = c.secciones;
+            const mias = s.plazas ? sumarPlazas(s.plazas.filas, misPuestos, misProv).plazas : null;
+            const partes = [
+              s.convocados && `${num(s.convocados.total)} convocados`,
+              s.plazas && `${num(sumarPlazas(s.plazas.filas).plazas)} plazas (${mias} de tus bolsas y provincias)`,
+              s.adjudicados && `${num(s.adjudicados.total)} adjudicadas`,
+              s.noCubiertas && `${num(sumarPlazas(s.noCubiertas.filas).plazas)} sin cubrir`,
+            ].filter(Boolean);
             return (
               <li key={c.id}>
-                <strong>{fechaLarga(c.fechaConvocatoria)}</strong>
-                <span>{t.ofertadas} plazas de tus especialidades · {t.adjudicadas} adjudicadas</span>
+                <strong>Convocatoria del {fechaLarga(c.fecha)}</strong>
+                <span>{partes.join(' · ')}</span>
               </li>
             );
           })}
         </ul>
-        <Fuente ejemplo={datos.esEjemplo} />
+        <Fuente />
       </section>
 
       <section aria-labelledby="t-acc">

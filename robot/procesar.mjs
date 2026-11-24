@@ -22,9 +22,20 @@ export function titulosConvocatoria(html) {
     .map((m) => m[0]);
 }
 
+/** Opciones del desplegable "Puesto" de la página → { codigo: nombre }. */
+export function puestosDelDesplegable(html) {
+  const res = {};
+  for (const m of html.matchAll(/<option[^>]*value="([0-9A-Z]{8})"[^>]*>([^<]+)/g)) {
+    const { nombre } = separarPuesto(m[2].includes(' - ') ? m[2] : `${m[1]} - ${m[2]}`);
+    res[m[1]] = nombre;
+  }
+  return res;
+}
+
 /** "00597038 - EDUCACIÓN PRIMARIA" → { codigo, nombre } */
 export function separarPuesto(texto) {
-  const m = /^\s*(\d{8})\s*-\s*(.+?)\s*$/.exec(texto ?? '');
+  // Códigos de 8 caracteres; algunos llevan letras (p. ej. ZT597038 = Zona de Transformación Social).
+  const m = /^\s*([0-9A-Z]{8})\s*-\s*(.+?)\s*$/.exec(texto ?? '');
   return m ? { codigo: m[1], nombre: m[2].replace(/\s+/g, ' ') } : { codigo: 'desconocido', nombre: String(texto ?? '').trim() };
 }
 

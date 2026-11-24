@@ -7,7 +7,7 @@
  "esEjemplo": false,
  "secciones": {
   "adjudicados": {
-   "leido": "2026-11-24T09:26:20.295Z",
+   "leido": "2026-11-24T09:29:18.461Z",
    "total": 199,
    "filas": [
     {
@@ -1216,16 +1216,52 @@
      }
     },
     {
-     "puesto": "desconocido",
+     "puesto": "AD594423",
      "provincia": "Cádiz",
-     "plazas": 2,
+     "plazas": 1,
      "porTipo": {},
      "porParticipacion": {
-      "S": 2
+      "S": 1
      }
     },
     {
-     "puesto": "desconocido",
+     "puesto": "PE590010",
+     "provincia": "Cádiz",
+     "plazas": 1,
+     "porTipo": {},
+     "porParticipacion": {
+      "S": 1
+     }
+    },
+    {
+     "puesto": "PE590010",
+     "provincia": "Sevilla",
+     "plazas": 1,
+     "porTipo": {},
+     "porParticipacion": {
+      "S": 1
+     }
+    },
+    {
+     "puesto": "TT597037",
+     "provincia": "Málaga",
+     "plazas": 1,
+     "porTipo": {},
+     "porParticipacion": {
+      "S": 1
+     }
+    },
+    {
+     "puesto": "ZT590058",
+     "provincia": "Sevilla",
+     "plazas": 1,
+     "porTipo": {},
+     "porParticipacion": {
+      "S": 1
+     }
+    },
+    {
+     "puesto": "ZT597038",
      "provincia": "Granada",
      "plazas": 1,
      "porTipo": {},
@@ -1234,7 +1270,7 @@
      }
     },
     {
-     "puesto": "desconocido",
+     "puesto": "ZT597038",
      "provincia": "Huelva",
      "plazas": 1,
      "porTipo": {},
@@ -1243,27 +1279,18 @@
      }
     },
     {
-     "puesto": "desconocido",
+     "puesto": "ZT597038",
      "provincia": "Málaga",
-     "plazas": 2,
+     "plazas": 1,
      "porTipo": {},
      "porParticipacion": {
-      "S": 2
-     }
-    },
-    {
-     "puesto": "desconocido",
-     "provincia": "Sevilla",
-     "plazas": 2,
-     "porTipo": {},
-     "porParticipacion": {
-      "S": 2
+      "S": 1
      }
     }
    ]
   },
   "noCubiertas": {
-   "leido": "2026-11-24T09:26:20.295Z",
+   "leido": "2026-11-24T09:29:18.461Z",
    "total": 22,
    "filas": [
     {
@@ -1466,7 +1493,7 @@
      }
     },
     {
-     "puesto": "desconocido",
+     "puesto": "AE590115",
      "provincia": "Córdoba",
      "plazas": 1,
      "porTipo": {
@@ -1477,7 +1504,7 @@
      }
     },
     {
-     "puesto": "desconocido",
+     "puesto": "AI594405",
      "provincia": "Málaga",
      "plazas": 1,
      "porTipo": {
@@ -1488,7 +1515,7 @@
      }
     },
     {
-     "puesto": "desconocido",
+     "puesto": "FD590101",
      "provincia": "Sevilla",
      "plazas": 1,
      "porTipo": {

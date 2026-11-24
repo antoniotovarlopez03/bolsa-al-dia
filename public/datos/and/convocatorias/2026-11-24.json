@@ -343,7 +343,7 @@
    }
   },
   "plazas": {
-   "leido": "2026-11-24T09:26:20.295Z",
+   "leido": "2026-11-24T09:29:18.461Z",
    "total": 486,
    "filas": [
     {
@@ -2435,6 +2435,17 @@
      }
     },
     {
+     "puesto": "00597APO",
+     "provincia": "Jaén",
+     "plazas": 1,
+     "porTipo": {
+      "Sustitución": 1
+     },
+     "porParticipacion": {
+      "V": 1
+     }
+    },
+    {
      "puesto": "00598001",
      "provincia": "Huelva",
      "plazas": 1,
@@ -2865,30 +2876,8 @@
      }
     },
     {
-     "puesto": "desconocido",
-     "provincia": "Cádiz",
-     "plazas": 4,
-     "porTipo": {
-      "Sustitución": 4
-     },
-     "porParticipacion": {
-      "V": 4
-     }
-    },
-    {
-     "puesto": "desconocido",
+     "puesto": "AE590115",
      "provincia": "Córdoba",
-     "plazas": 5,
-     "porTipo": {
-      "Sustitución": 5
-     },
-     "porParticipacion": {
-      "V": 5
-     }
-    },
-    {
-     "puesto": "desconocido",
-     "provincia": "Granada",
      "plazas": 1,
      "porTipo": {
       "Sustitución": 1
@@ -2898,8 +2887,140 @@
      }
     },
     {
-     "puesto": "desconocido",
+     "puesto": "AI594405",
+     "provincia": "Málaga",
+     "plazas": 1,
+     "porTipo": {
+      "Sustitución": 1
+     },
+     "porParticipacion": {
+      "V": 1
+     }
+    },
+    {
+     "puesto": "CL597024",
      "provincia": "Huelva",
+     "plazas": 1,
+     "porTipo": {
+      "Sustitución": 1
+     },
+     "porParticipacion": {
+      "V": 1
+     }
+    },
+    {
+     "puesto": "CL597PCT",
+     "provincia": "Cádiz",
+     "plazas": 1,
+     "porTipo": {
+      "Sustitución": 1
+     },
+     "porParticipacion": {
+      "V": 1
+     }
+    },
+    {
+     "puesto": "CM590PCT",
+     "provincia": "Sevilla",
+     "plazas": 1,
+     "porTipo": {
+      "Sustitución": 1
+     },
+     "porParticipacion": {
+      "V": 1
+     }
+    },
+    {
+     "puesto": "CM597PCT",
+     "provincia": "Sevilla",
+     "plazas": 1,
+     "porTipo": {
+      "Sustitución": 1
+     },
+     "porParticipacion": {
+      "V": 1
+     }
+    },
+    {
+     "puesto": "ER590124",
+     "provincia": "Jaén",
+     "plazas": 1,
+     "porTipo": {
+      "Sustitución": 1
+     },
+     "porParticipacion": {
+      "V": 1
+     }
+    },
+    {
+     "puesto": "FD590101",
+     "provincia": "Sevilla",
+     "plazas": 1,
+     "porTipo": {
+      "Sustitución": 1
+     },
+     "porParticipacion": {
+      "V": 1
+     }
+    },
+    {
+     "puesto": "MZ590058",
+     "provincia": "Málaga",
+     "plazas": 1,
+     "porTipo": {
+      "Sustitución": 1
+     },
+     "porParticipacion": {
+      "V": 1
+     }
+    },
+    {
+     "puesto": "PV590221",
+     "provincia": "Sevilla",
+     "plazas": 1,
+     "porTipo": {
+      "Sustitución": 1
+     },
+     "porParticipacion": {
+      "V": 1
+     }
+    },
+    {
+     "puesto": "TT597036",
+     "provincia": "Córdoba",
+     "plazas": 1,
+     "porTipo": {
+      "Sustitución": 1
+     },
+     "porParticipacion": {
+      "V": 1
+     }
+    },
+    {
+     "puesto": "TT597037",
+     "provincia": "Málaga",
+     "plazas": 1,
+     "porTipo": {
+      "Sustitución": 1
+     },
+     "porParticipacion": {
+      "V": 1
+     }
+    },
+    {
+     "puesto": "ZT590018",
+     "provincia": "Cádiz",
+     "plazas": 1,
+     "porTipo": {
+      "Sustitución": 1
+     },
+     "porParticipacion": {
+      "V": 1
+     }
+    },
+    {
+     "puesto": "ZT590058",
+     "provincia": "Jaén",
      "plazas": 2,
      "porTipo": {
       "Sustitución": 2
@@ -2909,36 +3030,69 @@
      }
     },
     {
-     "puesto": "desconocido",
-     "provincia": "Jaén",
-     "plazas": 4,
+     "puesto": "ZT590059",
+     "provincia": "Huelva",
+     "plazas": 1,
      "porTipo": {
-      "Sustitución": 4
+      "Sustitución": 1
      },
      "porParticipacion": {
-      "V": 4
+      "V": 1
      }
     },
     {
-     "puesto": "desconocido",
+     "puesto": "ZT590059",
      "provincia": "Málaga",
-     "plazas": 4,
+     "plazas": 1,
      "porTipo": {
-      "Sustitución": 4
+      "Sustitución": 1
      },
      "porParticipacion": {
-      "V": 4
+      "V": 1
      }
     },
     {
-     "puesto": "desconocido",
+     "puesto": "ZT590059",
      "provincia": "Sevilla",
-     "plazas": 5,
+     "plazas": 1,
      "porTipo": {
-      "Sustitución": 5
+      "Sustitución": 1
      },
      "porParticipacion": {
-      "V": 5
+      "V": 1
+     }
+    },
+    {
+     "puesto": "ZT597038",
+     "provincia": "Cádiz",
+     "plazas": 2,
+     "porTipo": {
+      "Sustitución": 2
+     },
+     "porParticipacion": {
+      "V": 2
+     }
+    },
+    {
+     "puesto": "ZT597038",
+     "provincia": "Córdoba",
+     "plazas": 3,
+     "porTipo": {
+      "Sustitución": 3
+     },
+     "porParticipacion": {
+      "V": 3
+     }
+    },
+    {
+     "puesto": "ZT597038",
+     "provincia": "Granada",
+     "plazas": 1,
+     "porTipo": {
+      "Sustitución": 1
+     },
+     "porParticipacion": {
+      "V": 1
      }
     }
    ]

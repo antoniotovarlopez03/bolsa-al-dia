@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { buscarBolsa, URL_SIPRI } from '../datos/catalogo';
-import type { BolsaSeguida, Disponibilidad, PaqueteDatos, Perfil } from '../datos/tipos';
-import { Ayuda, Cambio, Fuente, TEXTO_CONVOCADO, TEXTO_ORDEN, TEXTO_TIEMPO_REAL } from '../componentes/Comunes';
+import { URL_SIPRI } from '../datos/catalogo';
+import type { BolsaSeguida, Disponibilidad, Perfil } from '../datos/tipos';
+import { Ayuda, Cambio, Fuente, TEXTO_CONVOCADO, TEXTO_ORDEN, TEXTO_RANGO, TEXTO_TIEMPO_REAL } from '../componentes/Comunes';
 import { GraficaLinea } from '../componentes/Graficas';
-import { fechaCorta, hoyISO, num, totales } from '../utilidades';
+import { ResumenConvocados } from '../componentes/ResumenBolsa';
+import { type Datos, fechaCorta, hoyISO, num, puestoDe, sumarPlazas, ultimaCon, ultimosDos } from '../utilidades';
 
 const DISPONIBILIDAD: Record<Disponibilidad, string> = {
   'no-indicado': 'Sin indicar',
@@ -15,7 +16,7 @@ const DISPONIBILIDAD: Record<Disponibilidad, string> = {
 
 interface Props {
   perfil: Perfil;
-  datos: PaqueteDatos;
+  datos: Datos;
   setPerfil: (p: Perfil) => void;
 }
 
@@ -35,7 +36,7 @@ export default function MisBolsas({ perfil, datos, setPerfil }: Props) {
       <div className="pildoras" role="tablist">
         {perfil.bolsas.map((s) => (
           <button key={s.bolsaId} role="tab" aria-selected={abierta === s.bolsaId} className={abierta === s.bolsaId ? 'activa' : ''} onClick={() => setAbierta(s.bolsaId)}>
-            {buscarBolsa(s.bolsaId)?.nombre ?? s.bolsaId}
+            {datos.bolsa(s.bolsaId)?.nombre ?? s.bolsaId}
           </button>
         ))}
       </div>
@@ -47,7 +48,7 @@ export default function MisBolsas({ perfil, datos, setPerfil }: Props) {
   );
 }
 
-function DetalleBolsa({ s, datos, actualizar }: { s: BolsaSeguida; datos: PaqueteDatos; actualizar: (c: (s: BolsaSeguida) => BolsaSeguida) => void }) {
+function DetalleBolsa({ s, datos, actualizar }: { s: BolsaSeguida; datos: Datos; actualizar: (c: (s: BolsaSeguida) => BolsaSeguida) => void }) {
   const [orden, setOrden] = useState('');
   const [real, setReal] = useState('');
   const [fecha, setFecha] = useState(hoyISO());
@@ -73,10 +74,19 @@ function DetalleBolsa({ s, datos, actualizar }: { s: BolsaSeguida; datos: Paquet
 
   const borrarRegistro = (f: string) => actualizar((x) => ({ ...x, registros: x.registros.filter((g) => g.fecha !== f) }));
 
-  const ultimas = datos.convocatorias.slice(-6).reverse();
+  const puesto = puestoDe(s.bolsaId);
+  const ultimas = datos.convocatorias.slice().reverse();
+  const conConvocados = datos.convocatorias.filter((c) => c.secciones.convocados?.porPuesto[puesto]?.ordenMax != null);
+  const miOrden = ultimosDos(s.registros, 'ordenEnBolsa').actual?.ordenEnBolsa;
 
   return (
     <>
+      <section className="tarjeta">
+        <h2>Última convocatoria de esta bolsa</h2>
+        <ResumenConvocados conv={ultimaCon(datos.convocatorias, 'convocados')} puesto={puesto} miOrden={miOrden} />
+        <Fuente />
+      </section>
+
       <section className="tarjeta">
         <h2>Apuntar mis números</h2>
         <p className="nota">
@@ -142,25 +152,47 @@ function DetalleBolsa({ s, datos, actualizar }: { s: BolsaSeguida; datos: Paquet
       </section>
 
       <section className="tarjeta">
-        <h2>Plazas de esta bolsa en tus provincias</h2>
+        <h2>Evolución de la bolsa</h2>
+        <p className="nota">Mayor número de orden convocado en cada convocatoria (dato público).</p>
+        <GraficaLinea
+          titulo="Mayor número de orden convocado"
+          invertida={false}
+          puntos={conConvocados.map((c) => ({ etiqueta: fechaCorta(c.fecha), valor: c.secciones.convocados!.porPuesto[puesto].ordenMax! }))}
+          textoVacio="Hacen falta al menos dos convocatorias leídas. El histórico crece cada martes y jueves."
+        />
+        <Ayuda titulo="¿Cómo interpretar esta gráfica?">{TEXTO_RANGO}</Ayuda>
+      </section>
+
+      <section className="tarjeta">
+        <h2>Historial de convocatorias</h2>
         <Ayuda titulo="¿Qué significa estar convocado?">{TEXTO_CONVOCADO}</Ayuda>
-        <table className="tabla">
-          <thead><tr><th>Convocatoria</th><th>Plazas</th><th>Adjud.</th><th>Sin cubrir</th></tr></thead>
-          <tbody>
-            {ultimas.map((c) => {
-              const t = totales(c, [s.bolsaId], s.provincias);
-              return (
-                <tr key={c.id}>
-                  <td>{fechaCorta(c.fechaConvocatoria)}</td>
-                  <td>{t.ofertadas}</td>
-                  <td>{t.adjudicadas}</td>
-                  <td>{t.noCubiertas}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        <Fuente ejemplo={datos.esEjemplo} />
+        <div className="tabla-scroll">
+          <table className="tabla">
+            <thead>
+              <tr><th>Fecha</th><th>Convocados (orden)</th><th>Plazas*</th><th>Adjud.*</th><th>Sin cubrir*</th></tr>
+            </thead>
+            <tbody>
+              {ultimas.map((c) => {
+                const conv = c.secciones.convocados?.porPuesto[puesto];
+                const celda = (k: 'plazas' | 'adjudicados' | 'noCubiertas') =>
+                  c.secciones[k] ? sumarPlazas(c.secciones[k]!.filas, [puesto], s.provincias).plazas : '—';
+                return (
+                  <tr key={c.id}>
+                    <td>{fechaCorta(c.fecha)}</td>
+                    <td>
+                      {c.secciones.convocados ? (conv ? `${conv.convocados} (${num(conv.ordenMin)}–${num(conv.ordenMax)})` : '0') : '—'}
+                    </td>
+                    <td>{celda('plazas')}</td>
+                    <td>{celda('adjudicados')}</td>
+                    <td>{celda('noCubiertas')}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <p className="nota">* En tus provincias. "—" = listado aún no publicado o no leído.</p>
+        <Fuente />
       </section>
     </>
   );

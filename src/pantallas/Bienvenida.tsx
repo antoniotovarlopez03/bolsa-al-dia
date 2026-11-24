@@ -1,15 +1,17 @@
-import { useState } from 'react';
-import { CATALOGO } from '../datos/catalogo';
-import { PROVINCIAS_AND, type BolsaSeguida, type Perfil, type Provincia } from '../datos/tipos';
-import { hoyISO } from '../utilidades';
+import { useMemo, useState } from 'react';
+import { nombreCuerpo } from '../datos/catalogo';
+import { PROVINCIAS_AND, type Bolsa, type BolsaSeguida, type Perfil, type Provincia } from '../datos/tipos';
+import { hoyISO, normalizar } from '../utilidades';
 
 interface Props {
+  catalogo: Bolsa[];
+  cargando: boolean;
   perfilInicial: Perfil | null;
   onTerminar: (p: Perfil) => void;
   onCancelar?: () => void;
 }
 
-export default function Bienvenida({ perfilInicial, onTerminar, onCancelar }: Props) {
+export default function Bienvenida({ catalogo, cargando, perfilInicial, onTerminar, onCancelar }: Props) {
   const [paso, setPaso] = useState(perfilInicial ? 2 : 1);
   const [nombre, setNombre] = useState(perfilInicial?.nombre ?? '');
   const [bolsas, setBolsas] = useState<string[]>(perfilInicial?.bolsas.map((b) => b.bolsaId) ?? []);
@@ -35,12 +37,19 @@ export default function Bienvenida({ perfilInicial, onTerminar, onCancelar }: Pr
     });
   };
 
-  const visibles = CATALOGO.filter((b) => b.nombre.toLowerCase().includes(filtro.toLowerCase()));
+  // Agrupadas por cuerpo; la búsqueda ignora tildes y mayúsculas.
+  const grupos = useMemo(() => {
+    const f = normalizar(filtro.trim());
+    const visibles = catalogo.filter((b) => !f || normalizar(`${b.nombre} ${b.puesto}`).includes(f) || bolsas.includes(b.id));
+    const mapa = new Map<string, Bolsa[]>();
+    for (const b of visibles) mapa.set(b.cuerpo, [...(mapa.get(b.cuerpo) ?? []), b]);
+    return [...mapa.entries()].sort(([a], [b]) => nombreCuerpo(a).localeCompare(nombreCuerpo(b), 'es'));
+  }, [catalogo, filtro, bolsas]);
 
   return (
     <div className="app bienvenida">
       <main className="contenido">
-        <p className="pasos" aria-label={`Paso ${paso} de 3`}>Paso {paso} de 3</p>
+        <p className="pasos">Paso {paso} de 3</p>
 
         {paso === 1 && (
           <section>
@@ -48,7 +57,7 @@ export default function Bienvenida({ perfilInicial, onTerminar, onCancelar }: Pr
             <p className="grande">Sigue tus bolsas docentes de Andalucía de forma sencilla.</p>
             <ul className="lista-check">
               <li>✔ Gratis, sin anuncios y sin registro.</li>
-              <li>✔ Tus datos se quedan <strong>solo en este móvil</strong>.</li>
+              <li>✔ Tus datos se quedan <strong>solo en este dispositivo</strong>.</li>
               <li>✔ Nunca te pediremos tu contraseña de SIPRI.</li>
             </ul>
             <p className="nota">Herramienta independiente. No pertenece a la Junta de Andalucía.</p>
@@ -63,20 +72,27 @@ export default function Bienvenida({ perfilInicial, onTerminar, onCancelar }: Pr
         {paso === 2 && (
           <section>
             <h1>¿Qué bolsas quieres seguir?</h1>
-            <p>Puedes elegir varias especialidades.</p>
+            <p>Puedes elegir varias especialidades. {bolsas.length > 0 && <strong>Elegidas: {bolsas.length}</strong>}</p>
             <label className="campo">
               Buscar especialidad
-              <input value={filtro} onChange={(e) => setFiltro(e.target.value)} placeholder="Ej.: inglés, primaria…" />
+              <input type="search" value={filtro} onChange={(e) => setFiltro(e.target.value)} placeholder="Ej.: inglés, primaria, 00597038…" />
             </label>
-            <div className="opciones">
-              {visibles.map((b) => (
-                <label key={b.id} className={`opcion ${bolsas.includes(b.id) ? 'marcada' : ''}`}>
-                  <input type="checkbox" checked={bolsas.includes(b.id)} onChange={() => setBolsas(alternar(bolsas, b.id))} />
-                  <span>{b.nombre}<small> · {b.puesto}</small></span>
-                </label>
-              ))}
-            </div>
-            <div className="botones">
+            {cargando && <p className="nota">Cargando la lista completa de especialidades…</p>}
+            {grupos.map(([cuerpo, lista]) => (
+              <fieldset key={cuerpo} className="grupo">
+                <legend>{nombreCuerpo(cuerpo)}</legend>
+                <div className="opciones">
+                  {lista.map((b) => (
+                    <label key={b.id} className={`opcion ${bolsas.includes(b.id) ? 'marcada' : ''}`}>
+                      <input type="checkbox" checked={bolsas.includes(b.id)} onChange={() => setBolsas(alternar(bolsas, b.id))} />
+                      <span>{b.nombre}<small> · {b.puesto}</small></span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ))}
+            {!grupos.length && <p className="vacio">No hay especialidades con ese nombre.</p>}
+            <div className="botones fijos">
               {onCancelar ? <button className="boton" onClick={onCancelar}>Cancelar</button> : <button className="boton" onClick={() => setPaso(1)}>Atrás</button>}
               <button className="boton principal" disabled={!bolsas.length} onClick={() => setPaso(3)}>Siguiente</button>
             </div>
