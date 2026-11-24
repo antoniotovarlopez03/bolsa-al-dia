@@ -8,9 +8,14 @@
 - **Fase 4** (robot): `robot/sipri.mjs` lee Convocados (con nº de orden), Plazas, Adjudicados y No cubiertas (~10 peticiones) y guarda **solo cifras** en `public/datos/and/`. 9 pruebas (`npm run test:robot`). Catálogo de 116 especialidades (incl. bilingües, ZTS, puestos específicos). Tarea de GitHub Actions preparada, **inactiva** hasta subir a GitHub.
 - **Fase 5** (app con datos reales): sin datos de ejemplo. Inicio, Mis bolsas (rango de orden convocado y comparación orientativa con tu número, evolución, historial), SIPRI (convocatorias, estadísticas, calendario de martes/jueves habituales), aviso si los datos tienen más de 7 días. Datos guardados para uso sin conexión (NetworkFirst). Probado en vista móvil.
 
+- **Publicado (24-11-2026)**, con permiso de Antonio:
+  - App: https://bolsa-al-dia.vercel.app (Vercel Hobby, gratis; se republica sola con cada commit).
+  - Código: https://github.com/antoniotovarlopez03/bolsa-al-dia (público, decisión de Antonio).
+  - Robot activo en GitHub Actions (lun–vie, 4 veces/día). Primera ejecución en GitHub: correcta.
+
 ## Pendiente
-1. Subir a GitHub (repo público) y activar el robot — **requiere permiso de Antonio y su cuenta**.
-2. Publicar en Cloudflare Pages — **requiere permiso**.
+1. Corregir errata en la descripción del repo de GitHub ("Andaucía").
+2. Vigilar las primeras ejecuciones automáticas del robot (jueves 26-11).
 3. Iconos PNG para iPhone; páginas de privacidad/aviso legal con contacto genérico.
 4. Canal de Telegram para avisos.
 5. Fase 6: pruebas en Android, iPhone y ordenador reales.

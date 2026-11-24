@@ -15,7 +15,8 @@ PWA gratuita para que los docentes interinos de Andalucía sigan sus bolsas de t
 - No publicar ni desplegar sin permiso expreso. No poner el nombre de Antonio en la web.
 
 ## Arquitectura prevista
-- PWA estática: React + TypeScript + Vite + vite-plugin-pwa. Alojamiento: Cloudflare Pages (alt. GitHub Pages).
+- PWA estática: React + TypeScript + Vite + vite-plugin-pwa. Alojamiento: **Vercel Hobby** (https://bolsa-al-dia.vercel.app), publica cada commit de `main`.
+- Repo público: https://github.com/antoniotovarlopez03/bolsa-al-dia. Hacer push solo con permiso de Antonio.
 - Robot: GitHub Actions (repo público) lee `https://sipri.juntadeandalucia.es/sipri/...` y genera JSON de cifras.
 - Avisos: canal de Telegram (v1). Web Push más adelante si sigue siendo gratis.
 
