@@ -83,7 +83,34 @@ Columnas de "Adjudicados": orden de plaza adjudicada, ID plaza, **nombre**, cent
 - ℹ️ Las rutas `/sipri/...` no tienen prohibición en robots.txt (el subdominio no tiene robots.txt propio).
 - ℹ️ Las páginas solo muestran **la última convocatoria**: si no guardamos cada una, el histórico se pierde. Por eso nuestro robot guardará una copia (solo cifras) cada martes y jueves.
 
-### 2.6 Pendiente de comprobar (antes de programar el robot)
+### 2.6 ✅ Comprobado el 24-11-2026 (convocatoria del 24 de noviembre)
+
+- La página de **Convocados** carga sus filas pidiendo datos por dentro (formato JSON): `POST /sipri/convocados/buscar` con `pos`, `puesto` (código de 8 cifras), `offset`, `limit`. Hay que abrir antes la página para obtener la cookie de sesión.
+- Respuesta: `{ total, rows: [{ orden, apellidoNombreNif, puesto }] }`.
+  - **`orden` = número de orden en bolsa de cada persona convocada.** Ejemplo: Educación Primaria tenía 275 convocados.
+  - `apellidoNombreNif` = dato personal → **el robot lo descartará siempre, sin guardarlo**.
+  - No hay provincia en este listado: los convocados van por bolsa (especialidad).
+- Con esto el robot puede calcular, por bolsa y convocatoria: **número de convocados y hasta qué número de orden se ha llegado**. Es lo que la app comparará con el número que escribe el docente.
+- Sin filtrar especialidad (`puesto` vacío) devuelve **todas** las bolsas a la vez (2.123 convocados el 24-11).
+
+#### Los cuatro listados (todos con el mismo sistema, comprobado el 24-11-2026)
+
+Todos: abrir la página (cookie) → `POST` con `pos=0`, `offset`, `limit` (hasta 1000) y filtros vacíos → JSON `{ total, rows }`.
+
+| Listado | Dirección de datos | Campos útiles | Campo personal (se descarta) | Filas 24-11 |
+|---|---|---|---|---|
+| Convocados | `/sipri/convocados/buscar` | `orden` (orden en bolsa), `puesto` | `apellidoNombreNif` | 2.123 |
+| Plazas convocadas | `/sipri/plazas/buscar` | `idPlaza`, `centro`, `provincia`, `localidad`, `puesto`, `tipo` (sustitución/vacante), `numPla`, `participacion` (O/V…), `fFinAus` (cese previsto), `latitud`, `longitud` | — | 486 |
+| Adjudicados (conv. anterior) | `/sipri/adjudicaciones/buscar` | `idPlaza`, `centro`, `dProvincia`, `dLocalidad`, `puesto`, `participacion` | `apellidosNombreDni` | 199 |
+| Plazas no cubiertas | `/sipri/adjudicaciones/buscarNoCubiertas` | igual que Plazas + `observaciones` (p. ej. "Desierta/as") | — | 22 |
+
+Notas:
+- En Adjudicados, `orden` parece el orden de la plaza adjudicada (valores 1, 1, 2…), **no** el orden en bolsa. No se usará como posición hasta aclararlo.
+- Los códigos de puesto tienen prefijos distintos según la bolsa: `005…` (ordinaria), `105…`/`115…` (bilingües, p. ej. `11597034` Educación Física bilingüe inglés). El catálogo de la app debe incluirlos.
+- **Coste por convocatoria: unas 6–8 peticiones** (3 páginas de convocados + plazas + adjudicados + no cubiertas). Muy por debajo de cualquier uso abusivo.
+- Las páginas solo muestran la convocatoria vigente: el histórico depende de que el robot guarde cada una.
+
+### 2.6 bis — Lo que se planteaba comprobar (histórico)
 
 Hoy (martes) las tablas estaban vacías porque la convocatoria aún no se había publicado. Hay que mirar una convocatoria real para confirmar:
 

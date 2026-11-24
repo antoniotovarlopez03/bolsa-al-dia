@@ -11,7 +11,7 @@
 - SIPRI: el desplegable de Adjudicados usa códigos de cuerpo (590, 597...) y de puesto de 8 cifras (p. ej. 00597038).
 
 ## Pendiente
-1. Ver una convocatoria real con datos (tablas vacías el 24-11 por la mañana): ¿número de orden en "Convocados"?, ¿columnas?, ¿HTML o JavaScript?
+1. ✅ Fuentes comprobadas: Convocados (con **número de orden**), Plazas, Adjudicados y No cubiertas devuelven JSON con el mismo sistema; ~6–8 peticiones por convocatoria. Ver docs, apartado 2.6.
 2. Verificar el catálogo de especialidades (`src/datos/catalogo.ts`) contra el desplegable oficial.
 3. Iconos PNG para instalar en iPhone (ahora solo SVG).
 4. Fase 4: robot de lectura (GitHub Actions) → JSON sin nombres.
