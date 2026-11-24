@@ -21,7 +21,8 @@ PWA gratuita para que los docentes interinos de Andalucía sigan sus bolsas de t
 
 ## Código
 - `src/datos/` tipos, catálogo de bolsas, datos de ejemplo · `src/pantallas/` las 5 pantallas · `src/almacen.ts` guardado local.
-- Comandos: `npm run dev` (local), `npm run build` (comprueba tipos y genera `dist/`).
+- `robot/` lector de SIPRI (`procesar.mjs` funciones puras con lista blanca de campos, `sipri.mjs` red y ficheros) → `public/datos/and/`.
+- Comandos: `npm run dev` (local), `npm run build` (comprueba tipos y genera `dist/`), `npm run test:robot`, `npm run robot` (≈10 peticiones reales a SIPRI: no ejecutar sin necesidad).
 
 ## Documentos
 - `docs/01-analisis-inicial.md` — viabilidad, fuentes SIPRI, arquitectura, costes, riesgos, fases.

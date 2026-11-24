@@ -1,0 +1,43 @@
+# Robot de Bolsa al Día: lee los listados públicos de SIPRI y guarda solo cifras.
+# Coste: 0 € (GitHub Actions es gratuito en repositorios públicos).
+# Límite de seguridad: máximo 10 minutos por ejecución y 40 peticiones (ver robot/sipri.mjs).
+# Si falla, GitHub envía un correo al dueño del repositorio (aviso gratuito).
+name: Robot SIPRI
+
+on:
+  schedule:
+    # De lunes a viernes, 4 veces al día (hora UTC; en España +1 en invierno, +2 en verano).
+    - cron: '30 7,11,15,19 * * 1-5'
+  workflow_dispatch: {} # botón para lanzarlo a mano
+
+permissions:
+  contents: write
+
+concurrency:
+  group: robot-sipri
+  cancel-in-progress: false
+
+jobs:
+  leer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Pruebas del robot
+        run: node --test robot/procesar.test.mjs
+      - name: Leer SIPRI
+        run: node robot/sipri.mjs
+      - name: Guardar datos si han cambiado
+        run: |
+          if [ -n "$(git status --porcelain public/datos)" ]; then
+            git config user.name "bolsa-al-dia-robot"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add public/datos
+            git commit -m "Datos SIPRI $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push
+          else
+            echo "Sin cambios."
+          fi

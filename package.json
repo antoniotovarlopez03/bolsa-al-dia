@@ -7,7 +7,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "robot": "node robot/sipri.mjs",
+    "test:robot": "node --test robot/procesar.test.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
