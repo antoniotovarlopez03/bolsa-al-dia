@@ -13,10 +13,12 @@
   - Código: https://github.com/antoniotovarlopez03/bolsa-al-dia (público, decisión de Antonio).
   - Robot activo en GitHub Actions (lun–vie, 4 veces/día). Primera ejecución en GitHub: correcta.
 
+- **Diseño v0.3** (24-11-2026, publicado): verde Junta #007A33, barra superior con logotipo y "no oficial", iconos SVG de línea propios (`src/componentes/Iconos.tsx`), sin emojis. Iconos PNG de la app (Android, iPhone, favicon) generados con `npm run iconos`.
+
 ## Pendiente
 1. Corregir errata en la descripción del repo de GitHub ("Andaucía").
 2. Vigilar las primeras ejecuciones automáticas del robot (jueves 26-11).
-3. Iconos PNG para iPhone; páginas de privacidad/aviso legal con contacto genérico.
+3. Páginas de privacidad/aviso legal con contacto genérico.
 4. Canal de Telegram para avisos.
 5. Fase 6: pruebas en Android, iPhone y ordenador reales.
 6. Más adelante: fichero de series por especialidad si el histórico crece mucho (ahora se cargan las 16 últimas convocatorias).

@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icono.svg'],
+      includeAssets: ['icono.svg', 'favicon-32.png', 'apple-touch-icon.png'],
       workbox: {
         // Datos de SIPRI: se pide la versión nueva y, si no hay conexión, se usa la última guardada.
         runtimeCaching: [
@@ -31,7 +31,13 @@ export default defineConfig({
         display: 'standalone',
         background_color: '#f4f6f4',
         theme_color: '#007a33',
-        icons: [{ src: 'icono.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' }],
+        // Iconos generados con `npm run iconos` (scripts/iconos.mjs).
+        icons: [
+          { src: 'icono-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'icono-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: 'icono-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: 'icono.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
+        ],
       },
     }),
   ],
