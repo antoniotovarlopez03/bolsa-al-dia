@@ -31,10 +31,26 @@ export const diasDesde = (iso: string) => Math.floor((Date.now() - new Date(iso)
 /** Quita tildes y pasa a minúsculas para buscar ("ingles" encuentra "Inglés"). */
 export const normalizar = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
-/** Últimos dos registros que tengan el campo indicado. */
-export function ultimosDos(regs: RegistroPosicion[], campo: 'ordenEnBolsa' | 'situacionTiempoReal') {
-  const v = regs.filter((r) => r[campo] !== undefined).sort((a, b) => a.fecha.localeCompare(b.fecha));
-  return { actual: v.at(-1), anterior: v.at(-2) };
+export type LectorValor = (r: RegistroPosicion) => number | undefined;
+
+export const valorOrden: LectorValor = (r) => r.ordenEnBolsa;
+/** Situación principal: la de "tras la última adjudicación" (la que SIPRI da con incorporaciones); si no, tiempo real. */
+export const valorSituacion: LectorValor = (r) => r.situacionTrasAdjudicacion ?? r.situacionTiempoReal;
+export const valorProvincia = (p: string): LectorValor => (r) => r.porProvincia?.[p as keyof typeof r.porProvincia];
+
+/** Último y penúltimo valor apuntados (y la fecha del último). */
+export function ultimosDos(regs: RegistroPosicion[], valor: LectorValor) {
+  const v = regs.filter((r) => valor(r) !== undefined).sort((a, b) => a.fecha.localeCompare(b.fecha));
+  const a = v.at(-1), b = v.at(-2);
+  return { actual: a && valor(a), anterior: b && valor(b), fecha: a?.fecha };
+}
+
+/** Serie temporal de un valor, para las gráficas. */
+export function serie(regs: RegistroPosicion[], valor: LectorValor) {
+  return regs
+    .filter((r) => valor(r) !== undefined)
+    .sort((a, b) => a.fecha.localeCompare(b.fecha))
+    .map((r) => ({ etiqueta: fechaCorta(r.fecha), valor: valor(r)! }));
 }
 
 /** Suma plazas de unas filas, filtrando por especialidades y provincias (vacío = todas). */

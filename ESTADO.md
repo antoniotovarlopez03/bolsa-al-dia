@@ -16,11 +16,13 @@
 - **Detalle de plazas** (26-11-2026): el robot guarda cada plaza sin personas en `convocatorias/AAAA-MM-DD.plazas.json` (centro, localidad, tipo, participación, cese, coordenadas, motivo); la app lo muestra en SIPRI y en Mis bolsas. Robot: reintento de red y error visible como anotación en GitHub (fallaba el 25 y 26-11 porque no reconocía el aviso de SIPRI entre convocatoria y adjudicación; corregido en local).
 - **Diseño v0.3** (24-11-2026, publicado): verde Junta #007A33, barra superior con logotipo y "no oficial", iconos SVG de línea propios (`src/componentes/Iconos.tsx`), sin emojis. Iconos PNG de la app (Android, iPhone, favicon) generados con `npm run iconos`.
 
+- **Situación por provincias** (26-11-2026, en local): "Mis bolsas" permite apuntar orden, situación tras la última adjudicación (la principal, como en SIPRI), situación por provincia y tiempo real (opcional). Inicio muestra cada provincia con su cambio; gráfica por provincia. SIPRI actualiza tras cada adjudicación (jueves y lunes) y cuando alguien vuelve a la bolsa.
+
 ## Pendiente
 1. Corregir errata en la descripción del repo de GitHub ("Andaucía").
 2. Subir la corrección del robot y vigilar que termina bien en GitHub.
 3. Páginas de privacidad/aviso legal con contacto genérico.
-4. Canal de Telegram para avisos.
+4. Avisos "ya ha salido la convocatoria" (lo que más pide el cliente): Web Push con Cloudflare Workers gratis (cron cada pocos minutos mar/jue) — requiere cuenta de Antonio. Recordatorio "actualiza tu número" tras cada adjudicación.
 5. Fase 6: pruebas en Android, iPhone y ordenador reales.
 6. Más adelante: fichero de series por especialidad si el histórico crece mucho (ahora se cargan las 16 últimas convocatorias).
 

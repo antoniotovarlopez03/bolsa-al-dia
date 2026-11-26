@@ -3,7 +3,11 @@ import type { Perfil } from '../datos/tipos';
 import { Cambio, Fuente } from '../componentes/Comunes';
 import { ResumenConvocados } from '../componentes/ResumenBolsa';
 import { Icono, type NombreIcono } from '../componentes/Iconos';
-import { type Datos, fechaCorta, fechaLarga, num, puestoDe, saludo, sumarPlazas, ultimaCon, ultimosDos } from '../utilidades';
+import {
+  type Datos, fechaCorta, fechaLarga, num, puestoDe, saludo, sumarPlazas, ultimaCon, ultimosDos, valorOrden, valorProvincia,
+  valorSituacion,
+} from '../utilidades';
+import { PROVINCIAS_AND } from '../datos/tipos';
 
 const ACCESOS: Array<[string, NombreIcono, SeccionSipri]> = [
   ['Convocatorias', 'convocatoria', 'convocatorias'],
@@ -35,8 +39,10 @@ export default function Inicio({ perfil, datos, irA }: Props) {
         <h2 id="t-bolsas">Mis bolsas</h2>
         {perfil.bolsas.map((s) => {
           const puesto = puestoDe(s.bolsaId);
-          const orden = ultimosDos(s.registros, 'ordenEnBolsa');
-          const real = ultimosDos(s.registros, 'situacionTiempoReal');
+          const orden = ultimosDos(s.registros, valorOrden);
+          const sit = ultimosDos(s.registros, valorSituacion);
+          const provincias = PROVINCIAS_AND.map((p) => ({ p, ...ultimosDos(s.registros, valorProvincia(p)) })).filter((x) => x.actual !== undefined);
+          const ultimaFecha = [orden.fecha, sit.fecha, ...provincias.map((x) => x.fecha)].filter(Boolean).sort().at(-1);
           const plazas = convPlazas && sumarPlazas(convPlazas.secciones.plazas?.filas, [puesto], s.provincias).plazas;
           return (
             <article key={s.bolsaId} className="tarjeta tarjeta-bolsa">
@@ -44,18 +50,27 @@ export default function Inicio({ perfil, datos, irA }: Props) {
               <div className="cifras">
                 <div>
                   <span className="etq">Orden en bolsa</span>
-                  <span className="valor">{num(orden.actual?.ordenEnBolsa)}</span>
+                  <span className="valor">{num(orden.actual)}</span>
                 </div>
                 <div>
-                  <span className="etq">Situación en tiempo real</span>
-                  <span className="valor">{num(real.actual?.situacionTiempoReal)}</span>
-                  <Cambio actual={real.actual?.situacionTiempoReal} anterior={real.anterior?.situacionTiempoReal} />
+                  <span className="etq">Situación</span>
+                  <span className="valor">{num(sit.actual)}</span>
+                  <Cambio actual={sit.actual} anterior={sit.anterior} />
                 </div>
               </div>
-              {(orden.actual || real.actual) && (
-                <p className="nota">Apuntado por ti el {fechaCorta((real.actual ?? orden.actual)!.fecha)}</p>
+              {provincias.length > 0 && (
+                <ul className="provincias-mini" aria-label="Situación por provincias">
+                  {provincias.map((x) => (
+                    <li key={x.p}>
+                      <span>{x.p}</span>
+                      <strong>{num(x.actual)}</strong>
+                      <Cambio actual={x.actual} anterior={x.anterior} />
+                    </li>
+                  ))}
+                </ul>
               )}
-              <ResumenConvocados conv={convConvocados} puesto={puesto} miOrden={orden.actual?.ordenEnBolsa} />
+              {ultimaFecha && <p className="nota">Apuntado por ti el {fechaCorta(ultimaFecha)}</p>}
+              <ResumenConvocados conv={convConvocados} puesto={puesto} miOrden={orden.actual} />
               {convPlazas && (
                 <p className="linea-dato">
                   Plazas en tus provincias (convocatoria del {fechaCorta(convPlazas.fecha)}): <strong>{plazas}</strong>

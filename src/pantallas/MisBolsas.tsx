@@ -1,13 +1,18 @@
 import { useState } from 'react';
 import { URL_SIPRI } from '../datos/catalogo';
-import type { BolsaSeguida, Disponibilidad, Perfil } from '../datos/tipos';
-import { Ayuda, Cambio, Fuente, TEXTO_CONVOCADO, TEXTO_ORDEN, TEXTO_RANGO, TEXTO_TIEMPO_REAL } from '../componentes/Comunes';
+import { PROVINCIAS_AND, type BolsaSeguida, type Disponibilidad, type Perfil, type RegistroPosicion } from '../datos/tipos';
+import {
+  Ayuda, Cambio, Fuente, TEXTO_CONVOCADO, TEXTO_ORDEN, TEXTO_PROVINCIAS, TEXTO_RANGO, TEXTO_TIEMPO_REAL, TEXTO_TRAS_ADJ,
+} from '../componentes/Comunes';
 import { GraficaLinea } from '../componentes/Graficas';
 import { ResumenConvocados } from '../componentes/ResumenBolsa';
 import { Icono } from '../componentes/Iconos';
 import { ListaPlazas } from '../componentes/ListaPlazas';
 import { useDetalle } from '../datos/cargar';
-import { type Datos, fechaCorta, hoyISO, num, puestoDe, sumarPlazas, ultimaCon, ultimosDos } from '../utilidades';
+import {
+  type Datos, fechaCorta, hoyISO, num, puestoDe, serie, sumarPlazas, ultimaCon, ultimosDos, valorOrden, valorProvincia,
+  valorSituacion,
+} from '../utilidades';
 
 const DISPONIBILIDAD: Record<Disponibilidad, string> = {
   'no-indicado': 'Sin indicar',
@@ -53,34 +58,49 @@ export default function MisBolsas({ perfil, datos, setPerfil }: Props) {
 
 function DetalleBolsa({ s, datos, actualizar }: { s: BolsaSeguida; datos: Datos; actualizar: (c: (s: BolsaSeguida) => BolsaSeguida) => void }) {
   const [orden, setOrden] = useState('');
+  const [trasAdj, setTrasAdj] = useState('');
   const [real, setReal] = useState('');
+  const [provs, setProvs] = useState<Record<string, string>>({});
   const [fecha, setFecha] = useState(hoyISO());
   const [error, setError] = useState('');
+  const [guardado, setGuardado] = useState(false);
+  const [serieVista, setSerieVista] = useState('general');
 
   const regs = [...s.registros].sort((a, b) => a.fecha.localeCompare(b.fecha));
-  const conReal = regs.filter((r) => r.situacionTiempoReal !== undefined);
+  const provinciasForm: string[] = s.provincias.length ? s.provincias : [...PROVINCIAS_AND];
+  const soloDigitos = (v: string) => v.replace(/\D/g, '').slice(0, 6);
 
   const guardar = () => {
-    const o = orden ? Number(orden) : undefined;
-    const r = real ? Number(real) : undefined;
-    if (o === undefined && r === undefined) return setError('Escribe al menos uno de los dos números.');
-    if ([o, r].some((n) => n !== undefined && (!Number.isInteger(n) || n < 1 || n > 200000)))
+    const aNum = (v: string) => (v ? Number(v) : undefined);
+    const o = aNum(orden), t = aNum(trasAdj), r = aNum(real);
+    const porProvincia = Object.fromEntries(
+      Object.entries(provs).filter(([, v]) => v).map(([p, v]) => [p, Number(v)]),
+    ) as RegistroPosicion['porProvincia'];
+    const todos = [o, t, r, ...Object.values(porProvincia ?? {})];
+    if (todos.every((n) => n === undefined)) return setError('Escribe al menos un número.');
+    if (todos.some((n) => n !== undefined && (!Number.isInteger(n) || n < 1 || n > 200000)))
       return setError('Los números deben ser enteros positivos.');
     setError('');
-    actualizar((x) => ({
-      ...x,
-      registros: [...x.registros.filter((g) => g.fecha !== fecha), { fecha, ordenEnBolsa: o, situacionTiempoReal: r }],
-    }));
+    const nuevo: RegistroPosicion = { fecha, ordenEnBolsa: o, situacionTrasAdjudicacion: t, situacionTiempoReal: r };
+    if (Object.keys(porProvincia ?? {}).length) nuevo.porProvincia = porProvincia;
+    actualizar((x) => ({ ...x, registros: [...x.registros.filter((g) => g.fecha !== fecha), nuevo] }));
     setOrden('');
+    setTrasAdj('');
     setReal('');
+    setProvs({});
+    setGuardado(true);
   };
+
+  // Provincias con algún número apuntado (para la gráfica y el historial).
+  const provConDatos = PROVINCIAS_AND.filter((p) => regs.some((r) => r.porProvincia?.[p] !== undefined));
+  const lectorSerie = serieVista === 'general' ? valorSituacion : valorProvincia(serieVista);
 
   const borrarRegistro = (f: string) => actualizar((x) => ({ ...x, registros: x.registros.filter((g) => g.fecha !== f) }));
 
   const puesto = puestoDe(s.bolsaId);
   const ultimas = datos.convocatorias.slice().reverse();
   const conConvocados = datos.convocatorias.filter((c) => c.secciones.convocados?.porPuesto[puesto]?.ordenMax != null);
-  const miOrden = ultimosDos(s.registros, 'ordenEnBolsa').actual?.ordenEnBolsa;
+  const miOrden = ultimosDos(s.registros, valorOrden).actual;
 
   return (
     <>
@@ -90,64 +110,108 @@ function DetalleBolsa({ s, datos, actualizar }: { s: BolsaSeguida; datos: Datos;
         <Fuente />
       </section>
 
-      <PlazasDeLaBolsa datos={datos} puesto={puesto} provincias={s.provincias} listado="plazas" titulo="Plazas convocadas en tus provincias" />
-      <PlazasDeLaBolsa datos={datos} puesto={puesto} provincias={s.provincias} listado="adjudicados" titulo="Última adjudicación en tus provincias" />
-
       <section className="tarjeta">
         <h2>Apuntar mis números</h2>
         <p className="nota">
           Los encontrarás en <a href={URL_SIPRI} target="_blank" rel="noopener noreferrer">SIPRI</a> → acceso con tu usuario → consulta de bolsas. Nosotros nunca entramos con tu usuario.
         </p>
+        <p className="nota">Copia los números tal cual aparecen. Puedes dejar en blanco los que no veas.</p>
+
         <label className="campo">
           Orden en bolsa
-          <input inputMode="numeric" value={orden} onChange={(e) => setOrden(e.target.value.replace(/\D/g, ''))} placeholder="Ej.: 1245" />
+          <input inputMode="numeric" value={orden} onChange={(e) => setOrden(soloDigitos(e.target.value))} placeholder="Ej.: 603" />
         </label>
         <Ayuda titulo="¿Qué es el orden en bolsa?">{TEXTO_ORDEN}</Ayuda>
+
         <label className="campo">
-          Situación en tiempo real
-          <input inputMode="numeric" value={real} onChange={(e) => setReal(e.target.value.replace(/\D/g, ''))} placeholder="Ej.: 312" />
+          Situación tras la última adjudicación
+          <input inputMode="numeric" value={trasAdj} onChange={(e) => setTrasAdj(soloDigitos(e.target.value))} placeholder="Ej.: 37" />
+        </label>
+        <Ayuda titulo="¿Qué es la situación tras la última adjudicación?">{TEXTO_TRAS_ADJ}</Ayuda>
+
+        <fieldset className="grupo">
+          <legend>Situación por provincias</legend>
+          <div className="rejilla-provincias">
+            {provinciasForm.map((p) => (
+              <label key={p} className="campo-provincia">
+                <span>{p}</span>
+                <input
+                  inputMode="numeric"
+                  value={provs[p] ?? ''}
+                  onChange={(e) => setProvs({ ...provs, [p]: soloDigitos(e.target.value) })}
+                  placeholder="—"
+                  aria-label={`Situación en ${p}`}
+                />
+              </label>
+            ))}
+          </div>
+          <Ayuda titulo="¿De dónde saco estos números?">{TEXTO_PROVINCIAS}</Ayuda>
+        </fieldset>
+
+        <label className="campo">
+          Situación en tiempo real <span className="opcional">(si te aparece)</span>
+          <input inputMode="numeric" value={real} onChange={(e) => setReal(soloDigitos(e.target.value))} placeholder="Ej.: 40" />
         </label>
         <Ayuda titulo="¿Qué es la situación en tiempo real?">{TEXTO_TIEMPO_REAL}</Ayuda>
+
         <label className="campo">
           Fecha de la consulta
           <input type="date" value={fecha} max={hoyISO()} onChange={(e) => setFecha(e.target.value)} />
         </label>
         {error && <p className="error" role="alert">{error}</p>}
+        {guardado && !error && <p className="exito" role="status"><Icono nombre="check" tam={18} /> Guardado en este dispositivo.</p>}
         <button className="boton principal" onClick={guardar}>Guardar</button>
       </section>
 
       <section className="tarjeta">
-        <h2>Evolución de mi situación en tiempo real</h2>
+        <h2>Evolución de mi situación</h2>
+        {provConDatos.length > 0 && (
+          <div className="pildoras pequenas" role="tablist" aria-label="Elegir qué situación ver">
+            {['general', ...provConDatos].map((p) => (
+              <button key={p} role="tab" aria-selected={serieVista === p} className={serieVista === p ? 'activa' : ''} onClick={() => setSerieVista(p)}>
+                {p === 'general' ? 'General' : p}
+              </button>
+            ))}
+          </div>
+        )}
         <GraficaLinea
-          titulo="Personas por delante (cuanto más bajo, más cerca)"
-          puntos={conReal.map((r) => ({ etiqueta: fechaCorta(r.fecha), valor: r.situacionTiempoReal! }))}
+          titulo={`Personas por delante${serieVista === 'general' ? '' : ` en ${serieVista}`} (cuanto más bajo, más cerca)`}
+          puntos={serie(regs, lectorSerie)}
         />
       </section>
 
       {regs.length > 0 && (
         <section className="tarjeta">
           <h2>Historial</h2>
-          <table className="tabla">
-            <thead>
-              <tr><th>Fecha</th><th>Orden</th><th>Tiempo real</th><th>Cambio</th><th><span className="oculto">Borrar</span></th></tr>
-            </thead>
-            <tbody>
-              {regs.slice().reverse().map((r) => {
-                const prev = conReal.filter((x) => x.fecha < r.fecha).at(-1);
-                return (
-                  <tr key={r.fecha}>
-                    <td>{fechaCorta(r.fecha)}</td>
-                    <td>{num(r.ordenEnBolsa)}</td>
-                    <td>{num(r.situacionTiempoReal)}</td>
-                    <td><Cambio actual={r.situacionTiempoReal} anterior={prev?.situacionTiempoReal} /></td>
-                    <td><button className="icono-boton" aria-label={`Borrar registro del ${fechaCorta(r.fecha)}`} onClick={() => borrarRegistro(r.fecha)}><Icono nombre="cerrar" tam={18} /></button></td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="tabla-scroll">
+            <table className="tabla">
+              <thead>
+                <tr><th>Fecha</th><th>Orden</th><th>Situación</th><th>Provincias</th><th><span className="oculto">Borrar</span></th></tr>
+              </thead>
+              <tbody>
+                {regs.slice().reverse().map((r) => {
+                  const prev = regs.filter((x) => x.fecha < r.fecha && valorSituacion(x) !== undefined).at(-1);
+                  const textoProv = Object.entries(r.porProvincia ?? {}).map(([p, v]) => `${p} ${v}`).join(' · ');
+                  return (
+                    <tr key={r.fecha}>
+                      <td>{fechaCorta(r.fecha)}</td>
+                      <td>{num(r.ordenEnBolsa)}</td>
+                      <td>
+                        {num(valorSituacion(r))} <Cambio actual={valorSituacion(r)} anterior={prev && valorSituacion(prev)} />
+                      </td>
+                      <td className="celda-provincias">{textoProv || '—'}</td>
+                      <td><button className="icono-boton" aria-label={`Borrar registro del ${fechaCorta(r.fecha)}`} onClick={() => borrarRegistro(r.fecha)}><Icono nombre="cerrar" tam={18} /></button></td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </section>
       )}
+
+      <PlazasDeLaBolsa datos={datos} puesto={puesto} provincias={s.provincias} listado="plazas" titulo="Plazas convocadas en tus provincias" />
+      <PlazasDeLaBolsa datos={datos} puesto={puesto} provincias={s.provincias} listado="adjudicados" titulo="Última adjudicación en tus provincias" />
 
       <section className="tarjeta">
         <h2>Mi disponibilidad</h2>

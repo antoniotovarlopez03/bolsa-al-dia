@@ -270,3 +270,26 @@ svg { flex: none; }
 .etiqueta.aviso::first-letter { text-transform: uppercase; }
 .campo.compacto { margin-top: 4px; }
 .campo.compacto input { min-height: 44px; }
+
+/* ── Situación por provincias ── */
+.rejilla-provincias { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 6px 0; }
+.campo-provincia {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  border: 1px solid var(--borde); border-radius: var(--radio-s); padding: 4px 4px 4px 12px; background: var(--superficie);
+  font-size: .92rem; font-weight: 500;
+}
+.campo-provincia input {
+  width: 76px; min-height: 40px; text-align: right; font: inherit; font-weight: 700; font-variant-numeric: tabular-nums;
+  border: 0; border-radius: 8px; background: var(--verde-tinte-2); color: var(--texto); padding: 6px 10px;
+}
+.campo-provincia:focus-within { border-color: var(--verde); }
+.provincias-mini { list-style: none; padding: 0; margin: 4px 0 8px; display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 6px; }
+.provincias-mini li {
+  display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;
+  border: 1px solid var(--borde); border-radius: 10px; padding: 6px 10px; font-size: .85rem;
+}
+.provincias-mini span { color: var(--suave); }
+.provincias-mini strong { font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.pildoras.pequenas button { min-height: 34px; font-size: .85rem; padding: 4px 12px; flex: 0 0 auto; }
+.celda-provincias { font-size: .8rem; color: var(--suave); min-width: 120px; }
+.exito { display: flex; align-items: center; gap: 6px; color: var(--bueno); font-weight: 600; }

@@ -25,8 +25,12 @@ export interface RegistroPosicion {
   fecha: string; // AAAA-MM-DD
   /** Orden general en la bolsa (todas las personas de la bolsa). */
   ordenEnBolsa?: number;
-  /** Situación en tiempo real (personas que tiene realmente delante). */
+  /** Situación en tiempo real (personas que tiene realmente delante ahora). */
   situacionTiempoReal?: number;
+  /** "Sit. tras la última adjudicación" de SIPRI (descontando a quienes se van a incorporar). */
+  situacionTrasAdjudicacion?: number;
+  /** "Situación tras la última adjudicación por provincias" de SIPRI. Solo provincias con número. */
+  porProvincia?: Partial<Record<Provincia, number>>;
 }
 
 export type Disponibilidad = 'activo' | 'activo-no-disponible' | 'inactivo' | 'trabajando' | 'no-indicado';

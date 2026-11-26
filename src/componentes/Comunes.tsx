@@ -94,7 +94,11 @@ export function Cambio({ actual, anterior, menorEsMejor = true }: { actual?: num
 export const TEXTO_ORDEN =
   'Tu "Orden en bolsa" es el puesto que ocupas entre TODAS las personas de tu bolsa este curso. Cambia poco. Lo ves en SIPRI entrando con tu usuario.';
 export const TEXTO_TIEMPO_REAL =
-  'Tu "Situación en tiempo real" cuenta solo a las personas que tienes realmente delante: no cuenta a quien ya está trabajando, ni a los no disponibles, inactivos o excluidos. Cambia tras cada convocatoria (martes y jueves).';
+  'Tu "Situación en tiempo real" cuenta solo a las personas que tienes realmente delante ahora: no cuenta a quien ya está trabajando, ni a los no disponibles, inactivos o excluidos. SIPRI no la muestra a quien está trabajando en ese momento.';
+export const TEXTO_TRAS_ADJ =
+  'La "Situación tras la última adjudicación" es tu posición una vez se incorporen las personas adjudicadas. Suele estar unos números por debajo de la de tiempo real y es la más realista. Cambia los jueves y los lunes, cuando se publica cada adjudicación, y también cualquier día si alguien vuelve a la bolsa.';
+export const TEXTO_PROVINCIAS =
+  'En la misma pantalla de SIPRI aparece tu situación en cada provincia que pediste. En las provincias que no pediste sale un guion: déjalas en blanco.';
 export const TEXTO_CONVOCADO =
   'Estar "convocado" significa que te han llamado en una convocatoria concreta para pedir plazas. Ser convocado no garantiza que te adjudiquen una plaza.';
 export const TEXTO_RANGO =
