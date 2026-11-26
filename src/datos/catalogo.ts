@@ -56,5 +56,5 @@ export function crearCatalogo(puestos?: Record<string, string>): Bolsa[] {
 }
 
 export function nombreCuerpo(cuerpo: string) {
-  return CUERPOS[cuerpo] ?? `Cuerpo ${cuerpo}`;
+  return CUERPOS[cuerpo] ?? 'Otros puestos específicos';
 }

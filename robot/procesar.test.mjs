@@ -17,6 +17,10 @@ test('encuentra los títulos en el HTML', () => {
   assert.equal(titulosConvocatoria(html).length, 1);
 });
 
+test('acepta códigos de puesto de 7 letras (programas específicos de FPB)', () => {
+  assert.deepEqual(separarPuesto('CRPEFPB - PROG. ESPEC. FPB COCINA Y RESTAURACION'), { codigo: 'CRPEFPB', nombre: 'PROG. ESPEC. FPB COCINA Y RESTAURACION' });
+});
+
 test('lee las especialidades del desplegable', () => {
   const html = '<select id="puesto"><option value="">Seleccionar puesto...</option><option value="00597038">00597038 - EDUCACIÓN PRIMARIA</option><option value="11590006" >MATEMATICAS (INGLES) P.E.S.</option></select>';
   assert.deepEqual(puestosDelDesplegable(html), { '00597038': 'EDUCACIÓN PRIMARIA', '11590006': 'MATEMATICAS (INGLES) P.E.S.' });

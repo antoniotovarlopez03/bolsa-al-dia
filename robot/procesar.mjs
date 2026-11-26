@@ -25,7 +25,7 @@ export function titulosConvocatoria(html) {
 /** Opciones del desplegable "Puesto" de la página → { codigo: nombre }. */
 export function puestosDelDesplegable(html) {
   const res = {};
-  for (const m of html.matchAll(/<option[^>]*value="([0-9A-Z]{8})"[^>]*>([^<]+)/g)) {
+  for (const m of html.matchAll(/<option[^>]*value="([0-9A-Z]{6,10})"[^>]*>([^<]+)/g)) {
     const { nombre } = separarPuesto(m[2].includes(' - ') ? m[2] : `${m[1]} - ${m[2]}`);
     res[m[1]] = nombre;
   }
@@ -35,7 +35,7 @@ export function puestosDelDesplegable(html) {
 /** "00597038 - EDUCACIÓN PRIMARIA" → { codigo, nombre } */
 export function separarPuesto(texto) {
   // Códigos de 8 caracteres; algunos llevan letras (p. ej. ZT597038 = Zona de Transformación Social).
-  const m = /^\s*([0-9A-Z]{8})\s*-\s*(.+?)\s*$/.exec(texto ?? '');
+  const m = /^\s*([0-9A-Z]{6,10})\s*-\s*(.+?)\s*$/.exec(texto ?? '');
   return m ? { codigo: m[1], nombre: m[2].replace(/\s+/g, ' ') } : { codigo: 'desconocido', nombre: String(texto ?? '').trim() };
 }
 
@@ -49,7 +49,7 @@ export function resumirConvocados(filas, puestos = {}) {
   const res = {};
   for (const f of filas) {
     const { codigo, nombre } = separarPuesto(f.puesto);
-    puestos[codigo] ??= nombre;
+    if (codigo !== 'desconocido') puestos[codigo] ??= nombre;
     const orden = Number(f.orden);
     const r = (res[codigo] ??= { convocados: 0, ordenMin: null, ordenMax: null, ordenes: [] });
     r.convocados++;
@@ -94,7 +94,7 @@ export function resumirPlazas(filas, puestos = {}, campoProvincia = 'provincia')
   const mapa = new Map();
   for (const f of filas) {
     const { codigo, nombre } = separarPuesto(f.puesto);
-    puestos[codigo] ??= nombre;
+    if (codigo !== 'desconocido') puestos[codigo] ??= nombre;
     const provincia = String(f[campoProvincia] ?? 'Sin provincia').trim();
     const clave = `${codigo}|${provincia}`;
     const r = mapa.get(clave) ?? { puesto: codigo, provincia, plazas: 0, porTipo: {}, porParticipacion: {} };

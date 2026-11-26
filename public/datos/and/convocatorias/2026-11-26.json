@@ -1344,7 +1344,7 @@
    }
   },
   "plazas": {
-   "leido": "2026-11-26T19:52:36.792Z",
+   "leido": "2026-11-26T20:00:03.392Z",
    "total": 213,
    "filas": [
     {
@@ -2855,6 +2855,17 @@
      }
     },
     {
+     "puesto": "ACPEFPB",
+     "provincia": "Cádiz",
+     "plazas": 1,
+     "porTipo": {
+      "Sustitución": 1
+     },
+     "porParticipacion": {
+      "V": 1
+     }
+    },
+    {
      "puesto": "AE590115",
      "provincia": "Córdoba",
      "plazas": 1,
@@ -2877,19 +2888,8 @@
      }
     },
     {
-     "puesto": "desconocido",
+     "puesto": "CRPEFPB",
      "provincia": "Cádiz",
-     "plazas": 2,
-     "porTipo": {
-      "Sustitución": 2
-     },
-     "porParticipacion": {
-      "V": 2
-     }
-    },
-    {
-     "puesto": "desconocido",
-     "provincia": "Córdoba",
      "plazas": 1,
      "porTipo": {
       "Sustitución": 1
@@ -2912,6 +2912,17 @@
     {
      "puesto": "FD590101",
      "provincia": "Sevilla",
+     "plazas": 1,
+     "porTipo": {
+      "Sustitución": 1
+     },
+     "porParticipacion": {
+      "V": 1
+     }
+    },
+    {
+     "puesto": "IOPEFPB",
+     "provincia": "Córdoba",
      "plazas": 1,
      "porTipo": {
       "Sustitución": 1

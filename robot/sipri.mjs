@@ -201,13 +201,17 @@ async function main() {
     console.warn(`⚠️ No se pudieron leer las novedades: ${e.message}`);
   }
 
-  const antes = JSON.stringify(indice.puestos ?? {});
+  // Se compara el contenido sin depender del orden: JavaScript reordena las claves que parecen números.
+  const firma = (o) => JSON.stringify(Object.entries(o ?? {}).sort(([a], [b]) => a.localeCompare(b)));
   const nuevosPuestos = Object.fromEntries(
     Object.entries({ ...puestos, ...puestosDesplegables })
-      .filter(([c]) => /^[0-9A-Z]{8}$/.test(c))
+      .filter(([c]) => /^[0-9A-Z]{6,10}$/.test(c))
       .sort(([a], [b]) => a.localeCompare(b)),
   );
-  if (cambiadas.size || JSON.stringify(nuevosPuestos) !== antes) {
+  const puestosCambiados = Object.keys(nuevosPuestos).filter((c) => nuevosPuestos[c] !== indice.puestos?.[c]);
+  if (firma(nuevosPuestos) !== firma(indice.puestos))
+    console.log(`✔ catálogo: ${puestosCambiados.length} especialidades nuevas o renombradas (${puestosCambiados.slice(0, 5).join(', ')})`);
+  if (cambiadas.size || firma(nuevosPuestos) !== firma(indice.puestos)) {
     indice.actualizado = ahora;
     indice.puestos = nuevosPuestos;
     comprobarSinDatosPersonales(indice);
