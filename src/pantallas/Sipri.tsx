@@ -3,6 +3,8 @@ import type { SeccionSipri } from '../App';
 import type { Convocatoria, FilaPlazas, Perfil } from '../datos/tipos';
 import { Aviso, Fuente } from '../componentes/Comunes';
 import { Icono } from '../componentes/Iconos';
+import { ListaPlazas } from '../componentes/ListaPlazas';
+import { useDetalle } from '../datos/cargar';
 import { GraficaBarras } from '../componentes/Graficas';
 import {
   type Datos, type EventoCalendario, descargarICS, fechaLarga, hoyISO, num, puestoDe, sumarPlazas,
@@ -21,6 +23,11 @@ const SECCIONES: Array<[SeccionSipri, string]> = [
   ['calendario', 'Calendario'],
 ];
 const MAX_FILAS = 60;
+const LISTADOS_PLAZAS: Array<['plazas' | 'adjudicados' | 'noCubiertas', string]> = [
+  ['plazas', 'Plazas convocadas'],
+  ['adjudicados', 'Plazas adjudicadas'],
+  ['noCubiertas', 'Plazas sin cubrir'],
+];
 
 export default function Sipri({ perfil, datos, seccion, setSeccion }: Props) {
   return (
@@ -87,6 +94,7 @@ function resumenLinea(c: Convocatoria, puestos?: string[], prov?: string[]) {
 function DetalleConvocatoria({ c, datos, puestos, prov }: { c: Convocatoria; datos: Datos; puestos?: string[]; prov?: string[] }) {
   const nombre = (p: string) => datos.bolsa(`AND-${p}`)?.nombre ?? p;
   const s = c.secciones;
+  const det = useDetalle(c.id);
   const convocados = s.convocados
     ? Object.entries(s.convocados.porPuesto).filter(([p]) => !puestos || puestos.includes(p)).sort((a, b) => b[1].convocados - a[1].convocados)
     : [];
@@ -133,9 +141,22 @@ function DetalleConvocatoria({ c, datos, puestos, prov }: { c: Convocatoria; dat
           ) : <p className="vacio">Nadie de tus bolsas.</p>}
         </>
       )}
-      <TablaPlazas titulo="Plazas convocadas" filas={s.plazas?.filas} />
-      <TablaPlazas titulo="Plazas adjudicadas" filas={s.adjudicados?.filas} />
-      <TablaPlazas titulo="Plazas sin cubrir" filas={s.noCubiertas?.filas} />
+      {LISTADOS_PLAZAS.map(([k, titulo]) => {
+        if (!s[k]) return null;
+        const filasDet = det?.secciones[k]?.filas.filter(
+          (p) => (!puestos || puestos.includes(p.puesto)) && (!prov?.length || (p.provincia && prov.includes(p.provincia))),
+        );
+        return filasDet ? (
+          <div key={k}>
+            <h3>{titulo}</h3>
+            <ListaPlazas filas={filasDet} nombrePuesto={nombre} conEspecialidad={!puestos || puestos.length > 1} />
+          </div>
+        ) : (
+          <TablaPlazas key={k} titulo={titulo} filas={s[k]!.filas} />
+        );
+      })}
+      {det === undefined && <p className="nota">Cargando el detalle de las plazas…</p>}
+      {det === null && <p className="nota">De esta convocatoria solo hay totales: el detalle plaza a plaza se guarda desde el 26-11-2026.</p>}
       <Fuente fecha={c.fecha} />
     </div>
   );

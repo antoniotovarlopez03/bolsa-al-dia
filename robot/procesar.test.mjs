@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  comprobarSinDatosPersonales, fechaDeTitulo, mismaSeccion, puestosDelDesplegable, resumirConvocados, resumirPlazas, separarPuesto,
+  comprobarSinDatosPersonales, detallePlazas, fechaDeTitulo, mismaSeccion, puestosDelDesplegable, resumirConvocados, resumirPlazas, separarPuesto,
   titulosConvocatoria,
 } from './procesar.mjs';
 
@@ -57,6 +57,33 @@ test('resume plazas por puesto y provincia sumando numPla', () => {
 test('adjudicados: no copia el nombre aunque venga en la fila', () => {
   const r = resumirPlazas([{ puesto: '00597035 - MÚSICA', dProvincia: 'Sevilla', apellidosNombreDni: 'X' }], {}, 'dProvincia');
   assert.deepEqual(r, [{ puesto: '00597035', provincia: 'Sevilla', plazas: 1, porTipo: {}, porParticipacion: {} }]);
+});
+
+test('detalle de plazas: solo campos permitidos y coordenadas numéricas', () => {
+  const [d] = detallePlazas([{
+    idPlaza: 1, idClave: 9, centro: '41000000 - I.E.S. Inventado', provincia: 'Sevilla', localidad: 'Sevilla',
+    puesto: '00590011 - INGLES P.E.S.', fFinAus: '2027-01-26', tipo: 'Sustitución', numPla: 1, participacion: 'O',
+    observaciones: null, latitud: '37,3891', longitud: '-5,9845',
+  }], 'plazas');
+  assert.deepEqual(d, {
+    id: 1, puesto: '00590011', centro: '41000000 - I.E.S. Inventado', localidad: 'Sevilla', provincia: 'Sevilla',
+    tipo: 'Sustitución', n: 1, part: 'O', cese: '2027-01-26', lat: 37.3891, lon: -5.9845,
+  });
+});
+
+test('detalle de adjudicados: nunca copia el nombre', () => {
+  const r = detallePlazas([{
+    orden: 1, apellidosNombreDni: 'PERSONA INVENTADA 00000000T', idPlaza: 7, centro: 'C.E.I.P. Inventado',
+    puesto: '00597035 - MÚSICA', participacion: 'N', dLocalidad: 'Huelva', dProvincia: 'Huelva',
+  }], 'adjudicados');
+  assert.ok(!JSON.stringify(r).includes('INVENTADA 0'));
+  assert.equal(r[0].provincia, 'Huelva');
+  assert.ok(comprobarSinDatosPersonales(r));
+});
+
+test('detalle: descarta textos que parezcan un NIF', () => {
+  const [d] = detallePlazas([{ idPlaza: 2, puesto: '00590011 - X', provincia: 'Cádiz', observaciones: 'Renuncia 00000000T' }], 'noCubiertas');
+  assert.equal(d.motivo, undefined);
 });
 
 test('detecta un campo personal y aborta', () => {

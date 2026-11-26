@@ -1,7 +1,7 @@
 // Carga los datos públicos que genera el robot (public/datos/and/).
 // El service worker los guarda para poder verlos sin conexión.
 import { useEffect, useState } from 'react';
-import type { Convocatoria, Indice } from './tipos';
+import type { Convocatoria, DetalleConvocatoria, Indice } from './tipos';
 
 const RUTA = '/datos/and/';
 /** Cuántas convocatorias recientes se descargan (≈ 2 meses). Limita datos móviles. */
@@ -16,6 +16,30 @@ async function json<T>(url: string): Promise<T> {
   const r = await fetch(url, { cache: 'no-cache' });
   if (!r.ok) throw new Error(`${r.status}`);
   return r.json() as Promise<T>;
+}
+
+// ── Detalle de plazas: se descarga solo cuando se abre (y se recuerda mientras la app está abierta) ──
+const cacheDetalle = new Map<string, Promise<DetalleConvocatoria | null>>();
+
+function cargarDetalle(id: string) {
+  if (!cacheDetalle.has(id))
+    cacheDetalle.set(id, json<DetalleConvocatoria>(`${RUTA}convocatorias/${id}.plazas.json`).catch(() => null));
+  return cacheDetalle.get(id)!;
+}
+
+/** undefined = cargando · null = no hay detalle para esta convocatoria. */
+export function useDetalle(id: string | undefined): DetalleConvocatoria | null | undefined {
+  const [det, setDet] = useState<DetalleConvocatoria | null | undefined>(undefined);
+  useEffect(() => {
+    if (!id) return setDet(null);
+    let vivo = true;
+    setDet(undefined);
+    cargarDetalle(id).then((d) => vivo && setDet(d));
+    return () => {
+      vivo = false;
+    };
+  }, [id]);
+  return det;
 }
 
 export function useDatosPublicos(): EstadoCarga {

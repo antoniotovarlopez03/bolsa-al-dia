@@ -79,6 +79,28 @@ export interface Convocatoria {
   };
 }
 
+/** Una plaza concreta (fichero AAAA-MM-DD.plazas.json). No contiene datos de personas. */
+export interface DetallePlaza {
+  id: number;
+  puesto: string;
+  centro?: string; // "41700105 - I.E.S. Albero"
+  localidad?: string;
+  provincia?: string;
+  tipo?: string; // Sustitución / Vacante
+  n: number; // número de plazas
+  part?: string; // O = obligatoria, V = voluntaria
+  cese?: string; // fecha prevista de cese AAAA-MM-DD
+  lat?: number;
+  lon?: number;
+  motivo?: string; // solo en plazas no cubiertas
+}
+
+export interface DetalleConvocatoria {
+  id: string;
+  fecha: string;
+  secciones: Partial<Record<'plazas' | 'adjudicados' | 'noCubiertas', { leido: string; filas: DetallePlaza[] }>>;
+}
+
 export interface EntradaIndice {
   id: string;
   fecha: string;

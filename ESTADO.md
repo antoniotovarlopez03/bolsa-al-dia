@@ -13,11 +13,12 @@
   - Código: https://github.com/antoniotovarlopez03/bolsa-al-dia (público, decisión de Antonio).
   - Robot activo en GitHub Actions (lun–vie, 4 veces/día). Primera ejecución en GitHub: correcta.
 
+- **Detalle de plazas** (26-11-2026): el robot guarda cada plaza sin personas en `convocatorias/AAAA-MM-DD.plazas.json` (centro, localidad, tipo, participación, cese, coordenadas, motivo); la app lo muestra en SIPRI y en Mis bolsas. Robot: reintento de red y error visible como anotación en GitHub (fallaba en GitHub el 25 y 26-11; causa por confirmar).
 - **Diseño v0.3** (24-11-2026, publicado): verde Junta #007A33, barra superior con logotipo y "no oficial", iconos SVG de línea propios (`src/componentes/Iconos.tsx`), sin emojis. Iconos PNG de la app (Android, iPhone, favicon) generados con `npm run iconos`.
 
 ## Pendiente
 1. Corregir errata en la descripción del repo de GitHub ("Andaucía").
-2. Vigilar las primeras ejecuciones automáticas del robot (jueves 26-11).
+2. Confirmar por qué falla el robot en GitHub (ver la anotación de la próxima ejecución). Posible bloqueo de IP de GitHub por la Junta.
 3. Páginas de privacidad/aviso legal con contacto genérico.
 4. Canal de Telegram para avisos.
 5. Fase 6: pruebas en Android, iPhone y ordenador reales.

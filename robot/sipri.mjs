@@ -8,7 +8,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import {
-  comprobarSinDatosPersonales, fechaDeTitulo, mismaSeccion, puestosDelDesplegable, resumirConvocados, resumirPlazas,
+  comprobarSinDatosPersonales, detallePlazas, fechaDeTitulo, mismaSeccion, puestosDelDesplegable, resumirConvocados, resumirPlazas,
   titulosConvocatoria,
 } from './procesar.mjs';
 
@@ -28,12 +28,27 @@ const SALIDA = join(args.includes('--salida') ? args[args.indexOf('--salida') + 
 let peticiones = 0;
 const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 
-async function pedir(url, opciones = {}) {
+async function pedir(url, opciones = {}, intento = 1) {
   if (++peticiones > MAX_PETICIONES) throw new Error(`Superado el máximo de ${MAX_PETICIONES} peticiones. Parado por seguridad.`);
   if (peticiones > 1) await espera(PAUSA_MS);
-  const r = await fetch(url, { ...opciones, headers: { 'User-Agent': UA, ...opciones.headers }, signal: AbortSignal.timeout(30000) });
-  if (!r.ok) throw new Error(`${url} respondió ${r.status}`);
-  return r;
+  try {
+    const r = await fetch(url, { ...opciones, headers: { 'User-Agent': UA, ...opciones.headers }, signal: AbortSignal.timeout(30000) });
+    if (!r.ok) throw new Error(`${url} respondió ${r.status}`);
+    return r;
+  } catch (e) {
+    // Un único reintento tras 20 s (cortes puntuales de red o del servidor).
+    if (intento < 2) {
+      console.warn(`⚠️ Fallo en ${url} (${causa(e)}). Reintento en 20 s…`);
+      await espera(20000);
+      return pedir(url, opciones, intento + 1);
+    }
+    throw new Error(`${url}: ${causa(e)}`);
+  }
+}
+
+/** Mensaje legible de un error de red (fetch esconde la causa real en e.cause). */
+function causa(e) {
+  return [e?.message, e?.cause?.code, e?.cause?.message].filter(Boolean).join(' · ');
 }
 
 const LISTADOS = [
@@ -93,6 +108,7 @@ async function main() {
   const puestos = indice.puestos ?? {};
   const ahora = new Date().toISOString();
   const cambiadas = new Set();
+  const detallesCambiados = new Set();
   const ficheros = new Map();
 
   for (const l of LISTADOS) {
@@ -108,13 +124,32 @@ async function main() {
       const seccion = l.id === 'convocados'
         ? { leido: ahora, total: c.filas.length, porPuesto: resumirConvocados(c.filas, puestos) }
         : { leido: ahora, total: c.filas.length, filas: resumirPlazas(c.filas, puestos, l.id === 'adjudicados' ? 'dProvincia' : 'provincia') };
-      // Las filas originales (con nombres) se descartan aquí: solo sigue el resumen.
+
+      // Detalle de cada plaza (sin personas) en un fichero aparte: la app solo lo descarga al abrirlo.
+      if (l.id !== 'convocados') {
+        const rutaDet = join(SALIDA, 'convocatorias', `${c.fecha}.plazas.json`);
+        const det = ficheros.get(rutaDet) ?? (await leerJSON(rutaDet, { id: c.fecha, fecha: c.fecha, secciones: {} }));
+        ficheros.set(rutaDet, det);
+        const nueva = { leido: ahora, filas: detallePlazas(c.filas, l.id) };
+        if (!mismaSeccion(det.secciones[l.id], nueva)) {
+          det.secciones[l.id] = nueva;
+          detallesCambiados.add(rutaDet);
+        }
+      }
+      // Las filas originales (con nombres) se descartan aquí: solo siguen el resumen y el detalle sin personas.
       c.filas.length = 0;
       if (mismaSeccion(doc.secciones[l.id], seccion)) { console.log(`= ${l.id} ${c.fecha}: sin cambios`); continue; }
       doc.secciones[l.id] = seccion;
       cambiadas.add(ruta);
       console.log(`✔ ${l.id} ${c.fecha}: ${seccion.total} filas resumidas`);
     }
+  }
+
+  for (const ruta of detallesCambiados) {
+    const det = ficheros.get(ruta);
+    comprobarSinDatosPersonales(det);
+    await writeFile(ruta, JSON.stringify(det) + '\n');
+    console.log(`✔ detalle de plazas: ${ruta}`);
   }
 
   for (const ruta of cambiadas) {
@@ -146,10 +181,12 @@ async function main() {
     comprobarSinDatosPersonales(indice);
     await writeFile(rutaIndice, JSON.stringify(indice, null, 1) + '\n');
   }
-  console.log(`\nPeticiones a SIPRI: ${peticiones}. Ficheros actualizados: ${cambiadas.size}.`);
+  console.log(`\nPeticiones a SIPRI: ${peticiones}. Resúmenes actualizados: ${cambiadas.size}. Detalles actualizados: ${detallesCambiados.size}.`);
 }
 
 main().catch((e) => {
   console.error('❌ Robot detenido:', e.message);
+  // En GitHub Actions, el error queda como anotación visible en la página de la ejecución.
+  if (process.env.GITHUB_ACTIONS) console.log(`::error title=Robot SIPRI::${String(e.message).replace(/\r?\n/g, ' ')}`);
   process.exit(1);
 });

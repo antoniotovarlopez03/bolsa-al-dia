@@ -76,6 +76,43 @@ export function resumirPlazas(filas, puestos = {}, campoProvincia = 'provincia')
   return [...mapa.values()].sort((a, b) => a.puesto.localeCompare(b.puesto) || a.provincia.localeCompare(b.provincia));
 }
 
+const NIF = /\b\d{8}[A-Z]\b|\b[XYZ]\d{7}[A-Z]\b/i;
+const coord = (v) => {
+  const x = Number(String(v ?? '').replace(',', '.'));
+  return Number.isFinite(x) && x !== 0 ? Math.round(x * 1e5) / 1e5 : undefined;
+};
+const texto = (v, max = 80) => {
+  const t = String(v ?? '').replace(/\s+/g, ' ').trim();
+  return t && !NIF.test(t) ? t.slice(0, max) : undefined;
+};
+
+/**
+ * Detalle de cada plaza (no contiene personas). Lista blanca de campos:
+ * plazas / noCubiertas usan `provincia`; adjudicados usa `dProvincia`/`dLocalidad` y trae un nombre que se IGNORA.
+ */
+export function detallePlazas(filas, listado) {
+  const adj = listado === 'adjudicados';
+  return filas
+    .map((f) => {
+      const d = {
+        id: f.idPlaza,
+        puesto: separarPuesto(f.puesto).codigo,
+        centro: texto(f.centro, 120),
+        localidad: texto(adj ? f.dLocalidad : f.localidad),
+        provincia: texto(adj ? f.dProvincia : f.provincia),
+        tipo: texto(f.tipo, 30),
+        n: f.numPla === undefined ? 1 : n(f.numPla),
+        part: texto(f.participacion, 5),
+        cese: texto(f.fFinAus, 10),
+        lat: coord(f.latitud),
+        lon: coord(f.longitud),
+        motivo: listado === 'noCubiertas' ? texto(f.observaciones) : undefined,
+      };
+      return Object.fromEntries(Object.entries(d).filter(([, v]) => v !== undefined && v !== null));
+    })
+    .sort((a, b) => String(a.puesto).localeCompare(String(b.puesto)) || String(a.provincia).localeCompare(String(b.provincia)) || (a.id ?? 0) - (b.id ?? 0));
+}
+
 function ordenarClaves(o) {
   return Object.fromEntries(Object.entries(o).sort(([a], [b]) => a.localeCompare(b)));
 }

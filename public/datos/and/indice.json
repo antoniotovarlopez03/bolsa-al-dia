@@ -18,8 +18,8 @@
    "totales": {
     "convocados": 2123,
     "plazas": 486,
-    "adjudicados": null,
-    "noCubiertas": null
+    "adjudicados": 472,
+    "noCubiertas": 25
    }
   }
  ],
@@ -141,5 +141,5 @@
   "ZT590059": "ÁREA CIENTIFICO-TECNOLÓGICA (Z.T.S.)",
   "ZT597038": "EDUCACIÓN PRIMARIA (Z. TRANSF.SOCIAL)"
  },
- "actualizado": "2026-11-24T09:29:18.461Z"
+ "actualizado": "2026-11-26T09:38:06.282Z"
 }

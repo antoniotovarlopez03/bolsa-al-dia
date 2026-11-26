@@ -5,6 +5,8 @@ import { Ayuda, Cambio, Fuente, TEXTO_CONVOCADO, TEXTO_ORDEN, TEXTO_RANGO, TEXTO
 import { GraficaLinea } from '../componentes/Graficas';
 import { ResumenConvocados } from '../componentes/ResumenBolsa';
 import { Icono } from '../componentes/Iconos';
+import { ListaPlazas } from '../componentes/ListaPlazas';
+import { useDetalle } from '../datos/cargar';
 import { type Datos, fechaCorta, hoyISO, num, puestoDe, sumarPlazas, ultimaCon, ultimosDos } from '../utilidades';
 
 const DISPONIBILIDAD: Record<Disponibilidad, string> = {
@@ -87,6 +89,9 @@ function DetalleBolsa({ s, datos, actualizar }: { s: BolsaSeguida; datos: Datos;
         <ResumenConvocados conv={ultimaCon(datos.convocatorias, 'convocados')} puesto={puesto} miOrden={miOrden} />
         <Fuente />
       </section>
+
+      <PlazasDeLaBolsa datos={datos} puesto={puesto} provincias={s.provincias} listado="plazas" titulo="Plazas convocadas en tus provincias" />
+      <PlazasDeLaBolsa datos={datos} puesto={puesto} provincias={s.provincias} listado="adjudicados" titulo="Última adjudicación en tus provincias" />
 
       <section className="tarjeta">
         <h2>Apuntar mis números</h2>
@@ -196,5 +201,30 @@ function DetalleBolsa({ s, datos, actualizar }: { s: BolsaSeguida; datos: Datos;
         <Fuente />
       </section>
     </>
+  );
+}
+
+/** Plazas concretas de una bolsa en la convocatoria más reciente que tenga ese listado. */
+function PlazasDeLaBolsa({ datos, puesto, provincias, listado, titulo }: {
+  datos: Datos; puesto: string; provincias: string[]; listado: 'plazas' | 'adjudicados'; titulo: string;
+}) {
+  const conv = ultimaCon(datos.convocatorias, listado);
+  const det = useDetalle(conv?.id);
+  if (!conv) return null;
+  const filas = det?.secciones[listado]?.filas.filter((p) => p.puesto === puesto && (!provincias.length || (p.provincia && provincias.includes(p.provincia))));
+  const total = sumarPlazas(conv.secciones[listado]?.filas, [puesto], provincias).plazas;
+  return (
+    <section className="tarjeta">
+      <h2>{titulo}</h2>
+      <p className="nota">Convocatoria del {fechaCorta(conv.fecha)} · {total} {total === 1 ? 'plaza' : 'plazas'}</p>
+      {filas ? (
+        <ListaPlazas filas={filas} nombrePuesto={(c) => datos.bolsa(`AND-${c}`)?.nombre ?? c} conEspecialidad={false} />
+      ) : det === undefined ? (
+        <p className="nota">Cargando…</p>
+      ) : (
+        <p className="nota">El detalle plaza a plaza de esta convocatoria no está disponible (se guarda desde el 26-11-2026).</p>
+      )}
+      <Fuente fecha={conv.fecha} />
+    </section>
   );
 }

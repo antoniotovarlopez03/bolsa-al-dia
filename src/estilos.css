@@ -250,3 +250,23 @@ svg { flex: none; }
 @media (min-width: 700px) {
   .navegacion { grid-template-columns: repeat(4, minmax(0, 150px)); justify-content: center; }
 }
+
+/* ── Lista de plazas ── */
+.lista-plazas ul { list-style: none; padding: 0; margin: 8px 0 0; }
+.plaza { padding: 12px 0; border-bottom: 1px solid var(--borde); }
+.plaza:last-child { border-bottom: 0; }
+.plaza-cabecera { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.plaza-cabecera strong { font-weight: 650; }
+.plaza-lugar { color: var(--suave); font-size: .9rem; }
+.plaza-lugar .codigo { font-size: .8rem; }
+.plaza-especialidad { font-size: .9rem; margin-top: 2px; }
+.etiquetas { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.etiqueta {
+  display: inline-block; font-size: .76rem; font-weight: 600; padding: 3px 9px; border-radius: 999px;
+  background: var(--verde-tinte-2); border: 1px solid var(--borde); color: var(--suave); white-space: nowrap;
+}
+.etiqueta.fuerte { background: var(--verde); border-color: var(--verde); color: #fff; }
+.etiqueta.aviso { background: var(--aviso); border-color: var(--aviso-borde); color: var(--texto); white-space: normal; }
+.etiqueta.aviso::first-letter { text-transform: uppercase; }
+.campo.compacto { margin-top: 4px; }
+.campo.compacto input { min-height: 44px; }
