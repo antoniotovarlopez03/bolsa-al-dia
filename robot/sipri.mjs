@@ -14,6 +14,8 @@ import {
 
 /** Catálogo de especialidades visto en los desplegables oficiales (se rellena al leer). */
 const puestosDesplegables = {};
+/** Páginas sin título de convocatoria en esta ejecución. */
+const paginasSinTitulo = [];
 
 const BASE = 'https://sipri.juntadeandalucia.es/sipri/';
 const UA = 'Mozilla/5.0 (compatible; BolsaAlDia-robot/0.1; herramienta informativa gratuita y sin anuncios)';
@@ -69,8 +71,15 @@ async function leerListado(l) {
   Object.assign(puestosDesplegables, puestosDelDesplegable(html));
   const titulos = titulosConvocatoria(html);
   if (!titulos.length) {
-    if (/No hay (lista|convocatorias?)[^<]*publicad/i.test(html)) return [];
-    throw new Error(`${l.id}: no se encuentra el título de la convocatoria. ¿Ha cambiado la web de SIPRI?`);
+    // Entre convocatoria y adjudicación, SIPRI muestra mensajes variables ("No hay…", etc.).
+    // No es un error: se anota el texto visible (sin datos personales, la tabla está vacía) y se sigue.
+    const visible = (html.match(/<main[\s\S]*?<\/main>|<body[\s\S]*<\/body>/i)?.[0] ?? html)
+      .replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+    const aviso = visible.match(/(No hay|No existe|no se ha publicado|pendiente)[^.]{0,120}/i)?.[0];
+    console.log(`· ${l.id}: sin convocatoria publicada${aviso ? ` («${aviso.trim()}»)` : ''}`);
+    paginasSinTitulo.push({ id: l.id, reconocido: Boolean(aviso) });
+    return [];
   }
   const res = [];
   for (let pos = 0; pos < titulos.length; pos++) {
@@ -144,6 +153,10 @@ async function main() {
       console.log(`✔ ${l.id} ${c.fecha}: ${seccion.total} filas resumidas`);
     }
   }
+
+  // Si NINGUNA página tiene convocatoria ni un mensaje reconocible, probablemente ha cambiado la web.
+  if (paginasSinTitulo.length === LISTADOS.length && !paginasSinTitulo.some((p) => p.reconocido))
+    throw new Error('Ninguna página de SIPRI muestra convocatorias ni un aviso reconocible. ¿Ha cambiado la web?');
 
   for (const ruta of detallesCambiados) {
     const det = ficheros.get(ruta);
