@@ -57,6 +57,8 @@ export interface ResumenConvocados {
   /** Menor y mayor número de orden en bolsa entre las personas convocadas. */
   ordenMin: number | null;
   ordenMax: number | null;
+  /** Números de orden convocados (sin nombres). Desde el 26-11-2026. */
+  ordenes?: number[];
 }
 
 export interface FilaPlazas {
@@ -97,6 +99,7 @@ export interface DetallePlaza {
   lat?: number;
   lon?: number;
   motivo?: string; // solo en plazas no cubiertas
+  obs?: string; // observaciones de SIPRI (p. ej. "REDUCCIÓN DE JORNADA", "CENTRO VOLUNTARIO")
 }
 
 export interface DetalleConvocatoria {
@@ -109,6 +112,15 @@ export interface EntradaIndice {
   id: string;
   fecha: string;
   totales: { convocados: number | null; plazas: number | null; adjudicados: number | null; noCubiertas: number | null };
+}
+
+/** Nota informativa de la portada de SIPRI (novedades.json). */
+export interface NotaSipri {
+  id: string;
+  fecha: string; // AAAA-MM-DDTHH:MM:SS
+  titulo: string;
+  texto: string;
+  enlaces: string[];
 }
 
 export interface Indice {

@@ -18,6 +18,9 @@
 
 - **Situación por provincias** (26-11-2026, en local): "Mis bolsas" permite apuntar orden, situación tras la última adjudicación (la principal, como en SIPRI), situación por provincia y tiempo real (opcional). Inicio muestra cada provincia con su cambio; gráfica por provincia. SIPRI actualiza tras cada adjudicación (jueves y lunes) y cuando alguien vuelve a la bolsa.
 
+- **Mejoras sin nombres** (26-11-2026, en local): el robot guarda los números de orden convocados por bolsa (sin nombres), las observaciones de cada plaza (jornada reducida, centro voluntario…) y las notas informativas de la portada de SIPRI (`novedades.json`). La app dice "¿Estás convocado?" con tu orden, filtra plazas obligatorias/voluntarias, muestra "Avisos de SIPRI" en Inicio y el caso "estás trabajando".
+- **Decisiones del cliente** (26-11-2026): prioridad app de tiendas (Capacitor + Codemagic, como Repasa FP) con conexión a SIPRI dentro de la app y notificaciones. Sin buscador por nombre (RGPD). Sin colaborar con Radar Docente; histórico propio desde `/sipri/normativa/historico` (~477 convocatorias desde 2018). Antonio quiere probar antes la web.
+
 ## Pendiente
 1. Corregir errata en la descripción del repo de GitHub ("Andaucía").
 2. Subir la corrección del robot y vigilar que termina bien en GitHub.

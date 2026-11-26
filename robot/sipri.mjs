@@ -8,7 +8,8 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import {
-  comprobarSinDatosPersonales, detallePlazas, fechaDeTitulo, mismaSeccion, puestosDelDesplegable, resumirConvocados, resumirPlazas,
+  comprobarSinDatosPersonales, detallePlazas, fechaDeTitulo, mismaSeccion, novedadesDePortada, puestosDelDesplegable,
+  resumirConvocados, resumirPlazas,
   titulosConvocatoria,
 } from './procesar.mjs';
 
@@ -180,6 +181,24 @@ async function main() {
       },
     };
     indice.convocatorias = [...indice.convocatorias.filter((c) => c.id !== doc.id), entrada].sort((a, b) => a.fecha.localeCompare(b.fecha));
+  }
+
+  // Notas informativas de la portada (una petición). Si falla, no se detiene el robot.
+  try {
+    const html = await (await pedir(BASE + 'inicio/')).text();
+    const nuevas = novedadesDePortada(html);
+    const rutaNov = join(SALIDA, 'novedades.json');
+    const previo = await leerJSON(rutaNov, { notas: [] });
+    const mapa = new Map([...previo.notas, ...nuevas].map((n) => [n.id, n]));
+    const notas = [...mapa.values()].sort((a, b) => b.fecha.localeCompare(a.fecha)).slice(0, 40);
+    if (JSON.stringify(notas) !== JSON.stringify(previo.notas)) {
+      const doc = { actualizado: ahora, fuente: BASE, notas };
+      comprobarSinDatosPersonales(doc);
+      await writeFile(rutaNov, JSON.stringify(doc, null, 1) + '\n');
+      console.log(`✔ novedades: ${notas.length} notas (${nuevas.length} en portada)`);
+    } else console.log('= novedades: sin cambios');
+  } catch (e) {
+    console.warn(`⚠️ No se pudieron leer las novedades: ${e.message}`);
   }
 
   const antes = JSON.stringify(indice.puestos ?? {});

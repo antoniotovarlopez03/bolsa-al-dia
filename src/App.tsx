@@ -36,6 +36,7 @@ export default function App() {
     return {
       indice: carga.indice,
       convocatorias: [...carga.convocatorias].sort((a, b) => a.fecha.localeCompare(b.fecha)),
+      novedades: carga.novedades,
       catalogo,
       bolsa: (id) => catalogo.find((b) => b.id === id),
     };

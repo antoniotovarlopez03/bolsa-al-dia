@@ -1,7 +1,7 @@
 // Carga los datos públicos que genera el robot (public/datos/and/).
 // El service worker los guarda para poder verlos sin conexión.
 import { useEffect, useState } from 'react';
-import type { Convocatoria, DetalleConvocatoria, Indice } from './tipos';
+import type { Convocatoria, DetalleConvocatoria, Indice, NotaSipri } from './tipos';
 
 const RUTA = '/datos/and/';
 /** Cuántas convocatorias recientes se descargan (≈ 2 meses). Limita datos móviles. */
@@ -10,7 +10,7 @@ export const MAX_CONVOCATORIAS = 16;
 export type EstadoCarga =
   | { tipo: 'cargando' }
   | { tipo: 'error'; mensaje: string }
-  | { tipo: 'listo'; indice: Indice; convocatorias: Convocatoria[] };
+  | { tipo: 'listo'; indice: Indice; convocatorias: Convocatoria[]; novedades: NotaSipri[] };
 
 async function json<T>(url: string): Promise<T> {
   const r = await fetch(url, { cache: 'no-cache' });
@@ -54,7 +54,9 @@ export function useDatosPublicos(): EstadoCarga {
         const convocatorias = (
           await Promise.all(ultimas.map((c) => json<Convocatoria>(`${RUTA}convocatorias/${c.id}.json`).catch(() => null)))
         ).filter((c): c is Convocatoria => c !== null);
-        if (vivo) setEstado({ tipo: 'listo', indice, convocatorias });
+        // Las novedades son opcionales: si faltan, la app funciona igual.
+        const novedades = (await json<{ notas: NotaSipri[] }>(RUTA + 'novedades.json').catch(() => ({ notas: [] }))).notas;
+        if (vivo) setEstado({ tipo: 'listo', indice, convocatorias, novedades });
       } catch {
         if (vivo) setEstado({ tipo: 'error', mensaje: 'No se han podido cargar los datos de SIPRI. Comprueba tu conexión.' });
       }

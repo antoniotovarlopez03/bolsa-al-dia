@@ -96,7 +96,7 @@ export const TEXTO_ORDEN =
 export const TEXTO_TIEMPO_REAL =
   'Tu "Situación en tiempo real" cuenta solo a las personas que tienes realmente delante ahora: no cuenta a quien ya está trabajando, ni a los no disponibles, inactivos o excluidos. SIPRI no la muestra a quien está trabajando en ese momento.';
 export const TEXTO_TRAS_ADJ =
-  'La "Situación tras la última adjudicación" es tu posición una vez se incorporen las personas adjudicadas. Suele estar unos números por debajo de la de tiempo real y es la más realista. Cambia los jueves y los lunes, cuando se publica cada adjudicación, y también cualquier día si alguien vuelve a la bolsa.';
+  'La "Situación tras la última adjudicación" (en el menú de SIPRI: "Situación Provisional en Bolsa a fecha de…") es tu posición una vez se incorporen las personas adjudicadas. Suele estar unos números por debajo de la de tiempo real y es la más realista. Cambia los jueves y los lunes, cuando se publica cada adjudicación, y también cualquier día si alguien vuelve a la bolsa.';
 export const TEXTO_PROVINCIAS =
   'En la misma pantalla de SIPRI aparece tu situación en cada provincia que pediste. En las provincias que no pediste sale un guion: déjalas en blanco.';
 export const TEXTO_CONVOCADO =

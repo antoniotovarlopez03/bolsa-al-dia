@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  comprobarSinDatosPersonales, detallePlazas, fechaDeTitulo, mismaSeccion, puestosDelDesplegable, resumirConvocados, resumirPlazas, separarPuesto,
+  comprobarSinDatosPersonales, detallePlazas, fechaDeTitulo, mismaSeccion, novedadesDePortada, puestosDelDesplegable, resumirConvocados, resumirPlazas, separarPuesto,
   titulosConvocatoria,
 } from './procesar.mjs';
 
@@ -34,8 +34,8 @@ test('resume convocados por puesto SIN guardar nombres', () => {
   ];
   const puestos = {};
   const r = resumirConvocados(filas, puestos);
-  assert.deepEqual(r['00597038'], { convocados: 2, ordenMin: 575, ordenMax: 790 });
-  assert.deepEqual(r['00590011'], { convocados: 1, ordenMin: 12, ordenMax: 12 });
+  assert.deepEqual(r['00597038'], { convocados: 2, ordenMin: 575, ordenMax: 790, ordenes: [575, 790] });
+  assert.deepEqual(r['00590011'], { convocados: 1, ordenMin: 12, ordenMax: 12, ordenes: [12] });
   assert.equal(puestos['00590011'], 'INGLES P.E.S.');
   assert.ok(!JSON.stringify(r).includes('INVENTADA'));
   assert.ok(comprobarSinDatosPersonales(r));
@@ -84,6 +84,26 @@ test('detalle de adjudicados: nunca copia el nombre', () => {
 test('detalle: descarta textos que parezcan un NIF', () => {
   const [d] = detallePlazas([{ idPlaza: 2, puesto: '00590011 - X', provincia: 'Cádiz', observaciones: 'Renuncia 00000000T' }], 'noCubiertas');
   assert.equal(d.motivo, undefined);
+});
+
+test('lee las notas informativas de la portada', () => {
+  const html = `<article class="media media-body">
+    <h1 class="media-heading">NOTA INFORMATIVA PRÓXIMAS CONVOCATORIAS
+      <time datetime="2026-11-26 14:00:00.0"><small> jueves 26 noviembre 2026 14:00</small></time></h1>
+    <section><p align="justify">Se informa de que la próxima semana habrá una única convocatoria, el jueves 3 de diciembre.</p>
+    <p><a href="https://www.juntadeandalucia.es/educacion/sipri/normativa/normativa">Normativa</a> | <a href="https://x.juntadeandalucia.es/p">Plazas</a> | Convocados</p></section>
+  </article>`;
+  const [n] = novedadesDePortada(html);
+  assert.equal(n.titulo, 'NOTA INFORMATIVA PRÓXIMAS CONVOCATORIAS');
+  assert.equal(n.fecha, '2026-11-26T14:00:00');
+  assert.ok(n.texto.startsWith('Se informa'));
+  assert.ok(!n.texto.includes('Normativa | Plazas'));
+  assert.equal(n.enlaces.length, 2);
+});
+
+test('detalle de plazas: guarda observaciones (jornada parcial)', () => {
+  const [d] = detallePlazas([{ idPlaza: 3, puesto: '00590011 - X', provincia: 'Cádiz', observaciones: 'Media jornada' }], 'plazas');
+  assert.equal(d.obs, 'Media jornada');
 });
 
 test('detecta un campo personal y aborta', () => {

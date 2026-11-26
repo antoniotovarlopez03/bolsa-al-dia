@@ -1,9 +1,10 @@
-import type { Bolsa, Convocatoria, FilaPlazas, Indice, RegistroPosicion } from './datos/tipos';
+import type { Bolsa, Convocatoria, FilaPlazas, Indice, NotaSipri, RegistroPosicion } from './datos/tipos';
 
 /** Todo lo que las pantallas necesitan de los datos públicos. */
 export interface Datos {
   indice: Indice;
   convocatorias: Convocatoria[]; // ordenadas por fecha, de antigua a reciente
+  novedades: NotaSipri[]; // notas de la portada de SIPRI, de reciente a antigua
   catalogo: Bolsa[];
   bolsa: (id: string) => Bolsa | undefined;
 }

@@ -24,15 +24,29 @@ interface Props {
 export function ListaPlazas({ filas, nombrePuesto, conEspecialidad = true, vacio = 'Ninguna plaza.' }: Props) {
   const [visibles, setVisibles] = useState(PASO);
   const [buscar, setBuscar] = useState('');
+  const [part, setPart] = useState<'todas' | 'O' | 'V'>('todas');
   if (!filas.length) return <p className="vacio">{vacio}</p>;
 
   const f = normalizar(buscar.trim());
-  const lista = f
-    ? filas.filter((p) => normalizar(`${p.centro} ${p.localidad} ${p.provincia} ${nombrePuesto(p.puesto)}`).includes(f))
-    : filas;
+  const lista = filas.filter(
+    (p) =>
+      (part === 'todas' || p.part === part) &&
+      (!f || normalizar(`${p.centro} ${p.localidad} ${p.provincia} ${nombrePuesto(p.puesto)} ${p.obs ?? ''}`).includes(f)),
+  );
+  const cuenta = (c: 'O' | 'V') => filas.filter((p) => p.part === c).reduce((s, p) => s + p.n, 0);
+  const hayAmbas = cuenta('O') > 0 && cuenta('V') > 0;
 
   return (
     <div className="lista-plazas">
+      {hayAmbas && (
+        <div className="pildoras pequenas" role="tablist" aria-label="Filtrar por participación">
+          {([['todas', 'Todas'], ['O', `Obligatorias (${cuenta('O')})`], ['V', `Voluntarias (${cuenta('V')})`]] as const).map(([k, t]) => (
+            <button key={k} role="tab" aria-selected={part === k} className={part === k ? 'activa' : ''} onClick={() => { setPart(k); setVisibles(PASO); }}>
+              {t}
+            </button>
+          ))}
+        </div>
+      )}
       {filas.length > 8 && (
         <label className="campo compacto">
           <span className="oculto">Buscar centro o localidad</span>
@@ -54,9 +68,14 @@ export function ListaPlazas({ filas, nombrePuesto, conEspecialidad = true, vacio
               </div>
               {conEspecialidad && <div className="plaza-especialidad">{nombrePuesto(p.puesto)}</div>}
               <div className="etiquetas">
+                {p.part && PARTICIPACION[p.part] && (
+                  <span className={`etiqueta ${p.part === 'O' ? 'obligatoria' : 'voluntaria'}`}>{PARTICIPACION[p.part]}</span>
+                )}
                 {p.tipo && <span className="etiqueta">{p.tipo}</span>}
-                {p.part && PARTICIPACION[p.part] && <span className="etiqueta">{PARTICIPACION[p.part]}</span>}
                 {p.cese && <span className="etiqueta">Cese previsto {fechaCorta(p.cese)}</span>}
+                {p.obs?.split(/\.\s*/).map((o) => o.trim()).filter(Boolean).map((o) => (
+                  <span key={o} className="etiqueta info">{o.charAt(0) + o.slice(1).toLowerCase()}</span>
+                ))}
                 {p.motivo && <span className="etiqueta aviso">{p.motivo.toLowerCase()}</span>}
               </div>
             </li>

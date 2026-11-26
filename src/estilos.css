@@ -293,3 +293,18 @@ svg { flex: none; }
 .pildoras.pequenas button { min-height: 34px; font-size: .85rem; padding: 4px 12px; flex: 0 0 auto; }
 .celda-provincias { font-size: .8rem; color: var(--suave); min-width: 120px; }
 .exito { display: flex; align-items: center; gap: 6px; color: var(--bueno); font-weight: 600; }
+
+/* ── Convocado, participación, notas de SIPRI ── */
+.convocado { display: flex; gap: 8px; align-items: flex-start; border-radius: var(--radio-s); padding: 10px 12px; margin: 8px 0; }
+.convocado.si { background: var(--verde); color: #fff; }
+.convocado.si svg { margin-top: 2px; }
+.convocado.no { background: var(--superficie); border: 1px solid var(--borde); color: var(--texto); }
+.etiqueta.obligatoria { background: var(--verde-tinte); border-color: var(--verde); color: var(--verde); }
+.etiqueta.voluntaria { background: #eef2fb; border-color: #9fb3dd; color: #2f4f8f; }
+.etiqueta.info { background: var(--superficie); border-style: dashed; color: var(--texto); white-space: normal; }
+@media (prefers-color-scheme: dark) { .etiqueta.voluntaria { background: #1b2436; border-color: #3d5280; color: #a9bdf0; } }
+.notas ul { list-style: none; padding: 0; margin: 0; }
+.nota-sipri { border-bottom: 1px solid var(--borde); padding: 4px 0; }
+.nota-sipri:last-child { border-bottom: 0; }
+.nota-texto { font-size: .92rem; padding: 0 0 8px; }
+.nota-texto p { margin: 6px 0; }

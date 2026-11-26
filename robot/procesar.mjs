@@ -41,21 +41,52 @@ export function separarPuesto(texto) {
 
 const n = (v) => (Number.isFinite(Number(v)) ? Number(v) : 0);
 
-/** Convocados → por puesto: cuántos y rango de número de orden en bolsa. */
+/**
+ * Convocados → por puesto: cuántos, rango y lista de NÚMEROS de orden en bolsa (sin nombres).
+ * La lista permite a cada docente comprobar en su móvil si su número está convocado.
+ */
 export function resumirConvocados(filas, puestos = {}) {
   const res = {};
   for (const f of filas) {
     const { codigo, nombre } = separarPuesto(f.puesto);
     puestos[codigo] ??= nombre;
     const orden = Number(f.orden);
-    const r = (res[codigo] ??= { convocados: 0, ordenMin: null, ordenMax: null });
+    const r = (res[codigo] ??= { convocados: 0, ordenMin: null, ordenMax: null, ordenes: [] });
     r.convocados++;
     if (Number.isFinite(orden)) {
       r.ordenMin = r.ordenMin === null ? orden : Math.min(r.ordenMin, orden);
       r.ordenMax = r.ordenMax === null ? orden : Math.max(r.ordenMax, orden);
+      r.ordenes.push(orden);
     }
   }
+  for (const r of Object.values(res)) r.ordenes = [...new Set(r.ordenes)].sort((a, b) => a - b);
   return ordenarClaves(res);
+}
+
+/** Notas informativas de la portada de SIPRI (texto general, sin datos personales). */
+export function novedadesDePortada(html) {
+  const notas = [];
+  for (const m of html.matchAll(/<article[^>]*>([\s\S]*?)<\/article>/gi)) {
+    const bloque = m[1];
+    const h1 = bloque.match(/<h1[^>]*>([\s\S]*?)<time/i)?.[1];
+    const fecha = bloque.match(/<time[^>]*datetime="([^"]+)"/i)?.[1];
+    if (!h1 || !fecha) continue;
+    const limpiar = (s) => s.replace(/<br\s*\/?>|<\/p>/gi, '\n').replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/[ \t]+/g, ' ').replace(/\s*\n\s*/g, '\n').trim();
+    const seccion = bloque.match(/<section[^>]*>([\s\S]*?)<\/section>/i)?.[1] ?? '';
+    let cuerpo = limpiar(seccion).replace(/\n?Normativa \| Plazas \| Convocados.*$/s, '').trim();
+    if (NIF.test(cuerpo)) cuerpo = ''; // precaución: nunca publicar algo que parezca un NIF
+    const enlaces = [...seccion.matchAll(/href="(https:\/\/[^"]*juntadeandalucia\.es[^"]*)"/gi)].map((e) => e[1]);
+    const iso = fecha.replace(' ', 'T').replace(/\.\d+$/, '');
+    notas.push({
+      id: `${iso}|${limpiar(h1).slice(0, 60)}`,
+      fecha: iso,
+      titulo: limpiar(h1),
+      texto: cuerpo.slice(0, 1500),
+      enlaces: [...new Set(enlaces)].slice(0, 5),
+    });
+  }
+  return notas;
 }
 
 /** Plazas (convocadas o no cubiertas) → por puesto y provincia. */
@@ -107,6 +138,8 @@ export function detallePlazas(filas, listado) {
         lat: coord(f.latitud),
         lon: coord(f.longitud),
         motivo: listado === 'noCubiertas' ? texto(f.observaciones) : undefined,
+        // Observaciones de la plaza (p. ej. jornada parcial). Se descartan si parecen contener un NIF.
+        obs: listado === 'plazas' ? texto(f.observaciones, 160) : undefined,
       };
       return Object.fromEntries(Object.entries(d).filter(([, v]) => v !== undefined && v !== null));
     })

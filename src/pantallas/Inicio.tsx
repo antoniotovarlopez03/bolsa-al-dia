@@ -1,6 +1,7 @@
 import type { Pestana, SeccionSipri } from '../App';
 import type { Perfil } from '../datos/tipos';
-import { Cambio, Fuente } from '../componentes/Comunes';
+import { Aviso, Cambio, Fuente } from '../componentes/Comunes';
+import { NotasSipri } from '../componentes/NotasSipri';
 import { ResumenConvocados } from '../componentes/ResumenBolsa';
 import { Icono, type NombreIcono } from '../componentes/Iconos';
 import {
@@ -70,6 +71,11 @@ export default function Inicio({ perfil, datos, irA }: Props) {
                 </ul>
               )}
               {ultimaFecha && <p className="nota">Apuntado por ti el {fechaCorta(ultimaFecha)}</p>}
+              {s.disponibilidad === 'trabajando' && (
+                <Aviso tipo="info">
+                  Estás trabajando: SIPRI no muestra tu situación mientras ocupas una plaza. Volverá a aparecer cuando regreses a la bolsa.
+                </Aviso>
+              )}
               <ResumenConvocados conv={convConvocados} puesto={puesto} miOrden={orden.actual} />
               {convPlazas && (
                 <p className="linea-dato">
@@ -84,8 +90,15 @@ export default function Inicio({ perfil, datos, irA }: Props) {
         })}
       </section>
 
+      {datos.novedades.length > 0 && (
+        <section aria-labelledby="t-notas">
+          <h2 id="t-notas">Avisos de SIPRI</h2>
+          <div className="tarjeta"><NotasSipri notas={datos.novedades} /></div>
+        </section>
+      )}
+
       <section aria-labelledby="t-nov">
-        <h2 id="t-nov">Últimas novedades de SIPRI</h2>
+        <h2 id="t-nov">Últimas convocatorias</h2>
         <ul className="novedades">
           {datos.convocatorias.slice(-4).reverse().map((c) => {
             const s = c.secciones;
