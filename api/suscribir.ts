@@ -1,7 +1,7 @@
 // POST /api/suscribir   → guarda o actualiza la suscripción a avisos de este navegador.
 // DELETE /api/suscribir → la borra (el usuario desactiva los avisos).
 // GET /api/suscribir    → dice si los avisos están disponibles (sin datos personales).
-import { PROVINCIAS, TIPOS, avisosConfigurados, esCodigo, json, supabase } from './_comun';
+import { PROVINCIAS, TIPOS, avisosConfigurados, esCodigo, json, supabase } from './_comun.js';
 
 export function GET() {
   return json({ disponible: avisosConfigurados, clavePublica: process.env.VAPID_PUBLIC_KEY ?? null });

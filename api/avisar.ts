@@ -1,7 +1,7 @@
 // POST /api/avisar — lo llama SOLO el robot cuando detecta novedades en SIPRI.
 // Protegido con un secreto compartido (variable AVISOS_SECRET en Vercel y en GitHub).
 // Envía a cada suscripción un único aviso con lo que le interesa (sus especialidades y provincias).
-import { avisosConfigurados, configurarWebPush, json, supabase, type Suscripcion } from './_comun';
+import { avisosConfigurados, configurarWebPush, json, supabase, type Suscripcion } from './_comun.js';
 
 interface FilaPlazas { puesto: string; provincia: string; plazas: number }
 type Evento =
