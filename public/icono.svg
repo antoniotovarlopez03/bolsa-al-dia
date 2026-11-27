@@ -1,6 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <rect width="512" height="512" rx="112" fill="#007a33"/>
-  <rect x="120" y="282" width="72" height="118" rx="18" fill="#ffffff" opacity=".7"/>
-  <rect x="220" y="206" width="72" height="194" rx="18" fill="#ffffff" opacity=".85"/>
-  <rect x="320" y="112" width="72" height="288" rx="18" fill="#ffffff"/>
-</svg>
+  <g transform="translate(256 256) scale(0.92) translate(-260 -256)">
+  <rect x="126" y="76" width="286" height="360" rx="28" fill="#ffffff"/>
+  <circle cx="126" cy="126" r="17" fill="#007a33"/><circle cx="126" cy="186" r="17" fill="#007a33"/><circle cx="126" cy="246" r="17" fill="#007a33"/><circle cx="126" cy="306" r="17" fill="#007a33"/><circle cx="126" cy="366" r="17" fill="#007a33"/><circle cx="126" cy="412" r="17" fill="#007a33"/>
+  <g stroke="#cfe3d6" stroke-width="16" stroke-linecap="round">
+    <line x1="178" y1="146" x2="378" y2="146"/><line x1="178" y1="206" x2="378" y2="206"/>
+    <line x1="178" y1="330" x2="378" y2="330"/><line x1="178" y1="390" x2="348" y2="390"/>
+  </g>
+  <rect x="162" y="240" width="232" height="58" rx="18" fill="#ffcf3f"/></g></svg>

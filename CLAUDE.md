@@ -1,4 +1,4 @@
-# BOLSA AL DÍA — instrucciones del proyecto
+# BOLSA SUR (antes «Bolsa al Día») — instrucciones del proyecto
 
 PWA gratuita para que los docentes interinos de Andalucía sigan sus bolsas de trabajo y las convocatorias de SIPRI. Proyecto independiente (no oficial). Pensada para añadir otras comunidades en el futuro.
 

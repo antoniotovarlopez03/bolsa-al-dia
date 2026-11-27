@@ -1,6 +1,6 @@
-# Estado — BOLSA AL DÍA
+# Estado — BOLSA SUR (antes Bolsa al Día)
 
-**Última actualización:** 24-11-2026 · versión 0.2
+**Última actualización:** 27-11-2026 · versión 0.4
 
 ## Hecho
 - **Fase 1** (investigación): `docs/01-analisis-inicial.md`. Arquitectura aprobada (Cloudflare Pages + GitHub público + Telegram).
@@ -21,11 +21,14 @@
 - **Mejoras sin nombres** (26-11-2026, en local): el robot guarda los números de orden convocados por bolsa (sin nombres), las observaciones de cada plaza (jornada reducida, centro voluntario…) y las notas informativas de la portada de SIPRI (`novedades.json`). La app dice "¿Estás convocado?" con tu orden, filtra plazas obligatorias/voluntarias, muestra "Avisos de SIPRI" en Inicio y el caso "estás trabajando".
 - **Decisiones del cliente** (26-11-2026): prioridad app de tiendas (Capacitor + Codemagic, como Repasa FP) con conexión a SIPRI dentro de la app y notificaciones. Sin buscador por nombre (RGPD). Sin colaborar con Radar Docente; histórico propio desde `/sipri/normativa/historico` (~477 convocatorias desde 2018). Antonio quiere probar antes la web.
 
+- **Nombre y logo** (27-11-2026, en local): la app pasa a llamarse **Bolsa Sur**; logo «Lista de clase» (cuaderno con tu fila resaltada en amarillo), iconos regenerados con `npm run iconos`. La clave de guardado local sigue siendo `bolsa-al-dia:` para no perder datos. La dirección web y el repositorio siguen como `bolsa-al-dia` (cambiarlos rompería los enlaces ya enviados).
+- **Notificaciones** (decidido): igual que Repasa FP — notificaciones web (VAPID, web-push) + avisos de Apple en la app de iPhone, Supabase para las suscripciones y Vercel para enviar; el robot revisa SIPRI más a menudo en las franjas de publicación.
+
 ## Pendiente
 1. Corregir errata en la descripción del repo de GitHub ("Andaucía").
-2. Subir la corrección del robot y vigilar que termina bien en GitHub.
+2. Vigilar que el robot termina bien en GitHub (corrección subida y probada el 26-11).
 3. Páginas de privacidad/aviso legal con contacto genérico.
-4. Avisos "ya ha salido la convocatoria" (lo que más pide el cliente): Web Push con Cloudflare Workers gratis (cron cada pocos minutos mar/jue) — requiere cuenta de Antonio. Recordatorio "actualiza tu número" tras cada adjudicación.
+4. Notificaciones (lo que más pide el cliente), con el sistema de Repasa FP: suscripciones en Supabase, envío desde Vercel, el robot revisa SIPRI cada pocos minutos en las franjas de publicación. Recordatorio "actualiza tu número" tras cada adjudicación.
 5. Fase 6: pruebas en Android, iPhone y ordenador reales.
 6. Más adelante: fichero de series por especialidad si el histórico crece mucho (ahora se cargan las 16 últimas convocatorias).
 

@@ -1,4 +1,4 @@
-/* Bolsa al Día — estilo sobrio, verde institucional andaluz, iconos de línea. */
+/* Bolsa Sur — estilo sobrio, verde institucional andaluz, iconos de línea. */
 :root {
   --verde: #007a33;          /* verde Junta (Pantone 356 aprox.) */
   --verde-oscuro: #005f27;
@@ -65,7 +65,7 @@ svg { flex: none; }
 .barra-superior .interior { max-width: 680px; margin: 0 auto; display: flex; align-items: center; gap: 10px; }
 .marca { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.05rem; letter-spacing: -.01em; }
 .marca small { display: block; font-weight: 500; font-size: .72rem; opacity: .85; letter-spacing: .02em; }
-.marca-logo { width: 32px; height: 32px; border-radius: 9px; background: rgba(255, 255, 255, .16); display: grid; place-items: center; }
+.marca-logo { width: 38px; height: 38px; border-radius: 10px; background: rgba(255, 255, 255, .16); display: grid; place-items: center; }
 @media (prefers-color-scheme: dark) { .barra-superior { background: #0f2a1a; } }
 
 .franja {

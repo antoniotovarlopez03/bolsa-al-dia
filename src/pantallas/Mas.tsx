@@ -27,7 +27,7 @@ export default function Mas({ perfil, catalogo, setPerfil, editarPerfil }: Props
       setPerfil(await importarPerfil(f));
       setMensaje('Copia restaurada correctamente.');
     } catch {
-      setMensaje('No se pudo leer el archivo. ¿Es una copia de Bolsa al Día?');
+      setMensaje('No se pudo leer el archivo. ¿Es una copia de Bolsa Sur (o de Bolsa al Día)?');
     }
   };
 
@@ -74,7 +74,7 @@ export default function Mas({ perfil, catalogo, setPerfil, editarPerfil }: Props
       <section className="tarjeta">
         <h2>Aviso legal y fuentes</h2>
         <p>
-          <strong>Bolsa al Día es una herramienta informativa independiente.</strong> No pertenece a la Junta de Andalucía ni a SIPRI y no tiene carácter oficial.
+          <strong>Bolsa Sur es una herramienta informativa independiente.</strong> No pertenece a la Junta de Andalucía ni a SIPRI y no tiene carácter oficial.
           Ante cualquier duda, consulta siempre la web oficial.
         </p>
         <p>

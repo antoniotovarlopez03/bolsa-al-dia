@@ -1,6 +1,7 @@
 // Guarda el perfil SOLO en este dispositivo (localStorage). Nada sale a internet.
 import type { Perfil } from './datos/tipos';
 
+// La clave conserva el nombre antiguo para no perder los datos de quien ya usaba la app.
 const CLAVE = 'bolsa-al-dia:perfil';
 
 export function cargarPerfil(): Perfil | null {
@@ -36,7 +37,7 @@ export function exportarPerfil(p: Perfil): void {
   const blob = new Blob([JSON.stringify(p, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `bolsa-al-dia-copia-${new Date().toISOString().slice(0, 10)}.json`;
+  a.download = `bolsa-sur-copia-${new Date().toISOString().slice(0, 10)}.json`;
   a.click();
   URL.revokeObjectURL(a.href);
 }

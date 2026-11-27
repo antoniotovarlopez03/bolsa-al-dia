@@ -19,7 +19,7 @@ const puestosDesplegables = {};
 const paginasSinTitulo = [];
 
 const BASE = 'https://sipri.juntadeandalucia.es/sipri/';
-const UA = 'Mozilla/5.0 (compatible; BolsaAlDia-robot/0.1; herramienta informativa gratuita y sin anuncios)';
+const UA = 'Mozilla/5.0 (compatible; BolsaSur-robot/0.2; herramienta informativa gratuita y sin anuncios)';
 const PAUSA_MS = 2000;
 const MAX_PETICIONES = 40; // tope duro por ejecución
 const POR_PAGINA = 1000;

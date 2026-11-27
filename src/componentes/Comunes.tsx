@@ -4,13 +4,15 @@ import type { EstadoCarga } from '../datos/cargar';
 import { diasDesde, fechaCorta, fechaHora } from '../utilidades';
 import { Icono } from './Iconos';
 
-/** Logotipo: barras ascendentes, mismo dibujo que el icono de la app. */
-export function Logo({ tam = 20 }: { tam?: number }) {
+/** Logotipo «Lista de clase»: cuaderno con tu fila resaltada (mismo dibujo que el icono de la app). */
+export function Logo({ tam = 22 }: { tam?: number }) {
   return (
     <svg width={tam} height={tam} viewBox="0 0 24 24" aria-hidden="true">
-      <rect x="4" y="13" width="4" height="7" rx="1.2" fill="#fff" opacity=".7" />
-      <rect x="10" y="9" width="4" height="11" rx="1.2" fill="#fff" opacity=".85" />
-      <rect x="16" y="4" width="4" height="16" rx="1.2" fill="#fff" />
+      <rect x="5" y="2.5" width="15" height="19" rx="2" fill="#fff" />
+      {[5.5, 9, 12.5, 16, 19].map((y) => <circle key={y} cx="5" cy={y} r="1.1" fill="#007a33" />)}
+      <rect x="8" y="5.5" width="9.5" height="1.4" rx=".7" fill="#cfe3d6" />
+      <rect x="7.2" y="10.2" width="11.2" height="3.2" rx="1.1" fill="#ffcf3f" />
+      <rect x="8" y="16.5" width="9.5" height="1.4" rx=".7" fill="#cfe3d6" />
     </svg>
   );
 }
@@ -20,9 +22,9 @@ export function BarraSuperior() {
     <header className="barra-superior">
       <div className="interior">
         <div className="marca">
-          <span className="marca-logo"><Logo /></span>
+          <span className="marca-logo"><Logo tam={28} /></span>
           <span>
-            Bolsa al Día
+            Bolsa Sur
             <small>Bolsas docentes de Andalucía · no oficial</small>
           </span>
         </div>

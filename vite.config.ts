@@ -23,8 +23,8 @@ export default defineConfig({
         ],
       },
       manifest: {
-        name: 'Bolsa al Día',
-        short_name: 'Bolsa al Día',
+        name: 'Bolsa Sur · Bolsas docentes de Andalucía',
+        short_name: 'Bolsa Sur',
         description: 'Sigue tus bolsas docentes de Andalucía. Herramienta independiente, no oficial.',
         lang: 'es',
         start_url: '/',

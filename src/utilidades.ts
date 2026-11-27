@@ -77,15 +77,15 @@ export interface EventoCalendario {
 
 /** Exporta eventos a un archivo .ics (Google Calendar, Apple, Outlook). */
 export function descargarICS(eventos: EventoCalendario[]) {
-  const lineas = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//BOLSA AL DIA//ES'];
+  const lineas = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//BOLSA SUR//ES'];
   eventos.forEach((e, i) => {
     const d = e.fecha.replace(/-/g, '');
-    lineas.push('BEGIN:VEVENT', `UID:${d}-${i}@bolsa-al-dia`, `DTSTART;VALUE=DATE:${d}`, `SUMMARY:${e.titulo}`, 'END:VEVENT');
+    lineas.push('BEGIN:VEVENT', `UID:${d}-${i}@bolsa-sur`, `DTSTART;VALUE=DATE:${d}`, `SUMMARY:${e.titulo}`, 'END:VEVENT');
   });
   lineas.push('END:VCALENDAR');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([lineas.join('\r\n')], { type: 'text/calendar' }));
-  a.download = 'bolsa-al-dia-calendario.ics';
+  a.download = 'bolsa-sur-calendario.ics';
   a.click();
   URL.revokeObjectURL(a.href);
 }

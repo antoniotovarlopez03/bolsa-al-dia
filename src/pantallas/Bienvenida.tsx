@@ -56,7 +56,7 @@ export default function Bienvenida({ catalogo, cargando, perfilInicial, onTermin
 
         {paso === 1 && (
           <section>
-            <h1>Bienvenida a Bolsa al Día</h1>
+            <h1>Bienvenida a Bolsa Sur</h1>
             <p className="grande">Sigue tus bolsas docentes de Andalucía de forma sencilla.</p>
             <ul className="lista-check">
               <li><Icono nombre="check" tam={20} /> Gratis, sin anuncios y sin registro.</li>
