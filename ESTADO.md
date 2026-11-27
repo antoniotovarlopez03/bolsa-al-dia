@@ -28,7 +28,7 @@
 1. Corregir errata en la descripción del repo de GitHub ("Andaucía").
 2. Vigilar que el robot termina bien en GitHub (corrección subida y probada el 26-11).
 3. Páginas de privacidad/aviso legal con contacto genérico.
-4. Configurar los avisos (Antonio): Upstash en Vercel Storage, claves VAPID y AVISOS_SECRET en Vercel y GitHub — ver docs/02-avisos-configuracion.md. Después probar con el botón de aviso de prueba.
+4. Avisos: Upstash creado y conectado (27-11), VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY y AVISOS_SECRET puestas en Vercel. Falta: AVISOS_SECRET en GitHub (Settings → Secrets → Actions) y probar con el aviso de prueba.
 5. Fase 6: pruebas en Android, iPhone y ordenador reales.
 6. Más adelante: fichero de series por especialidad si el histórico crece mucho (ahora se cargan las 16 últimas convocatorias).
 
