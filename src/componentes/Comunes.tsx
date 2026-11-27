@@ -7,12 +7,14 @@ import { Icono } from './Iconos';
 /** Logotipo «Lista de clase»: cuaderno con tu fila resaltada (mismo dibujo que el icono de la app). */
 export function Logo({ tam = 22 }: { tam?: number }) {
   return (
-    <svg width={tam} height={tam} viewBox="0 0 24 24" aria-hidden="true">
-      <rect x="5" y="2.5" width="15" height="19" rx="2" fill="#fff" />
-      {[5.5, 9, 12.5, 16, 19].map((y) => <circle key={y} cx="5" cy={y} r="1.1" fill="#007a33" />)}
-      <rect x="8" y="5.5" width="9.5" height="1.4" rx=".7" fill="#cfe3d6" />
-      <rect x="7.2" y="10.2" width="11.2" height="3.2" rx="1.1" fill="#ffcf3f" />
-      <rect x="8" y="16.5" width="9.5" height="1.4" rx=".7" fill="#cfe3d6" />
+    // Pizarra: marco de madera, encerado verde y una línea de tiza que sube.
+    <svg width={tam} height={tam} viewBox="0 0 512 512" aria-hidden="true">
+      <rect x="24" y="24" width="464" height="464" rx="104" fill="#7b4a26" />
+      <rect x="70" y="70" width="372" height="310" rx="34" fill="#1d7a3c" />
+      <polyline points="122,316 210,256 256,290 334,190 400,160" fill="none" stroke="#fff" strokeWidth="30" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="400" cy="160" r="30" fill="#ffcf3f" />
+      <rect x="104" y="410" width="304" height="26" rx="13" fill="#5a3418" />
+      <rect x="300" y="396" width="64" height="28" rx="10" fill="#fff" />
     </svg>
   );
 }
