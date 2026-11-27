@@ -1,0 +1,43 @@
+# App de iPhone de Bolsa Sur con Codemagic (igual que Repasa FP): compila en un Mac en la nube,
+# firma y sube a TestFlight. Se lanza a mano desde codemagic.io («Start new build»).
+# Usa la integración de App Store Connect que ya existe en Codemagic («Repasa App Store»):
+# es la clave del mismo equipo de Apple y sirve para todas sus apps. Pasos: docs/03-app-iphone.md.
+workflows:
+  ios-testflight:
+    name: Bolsa Sur · iPhone (TestFlight)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    integrations:
+      app_store_connect: Repasa App Store
+    environment:
+      node: 22
+      xcode: latest
+      cocoapods: default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: es.bolsasur.app
+      vars:
+        XCODE_WORKSPACE: ios/App/App.xcworkspace
+        XCODE_SCHEME: App
+        APP_STORE_APPLE_ID: 0000000000 # ← poner el «Apple ID» numérico de la app en App Store Connect
+    scripts:
+      - name: Instalar paquetes
+        script: npm ci
+      - name: Compilar la web que va dentro de la app
+        script: npm run build
+      - name: Preparar el proyecto de iPhone
+        script: npx cap sync ios
+      - name: Firma (certificados y perfiles de Apple)
+        script: xcode-project use-profiles
+      - name: Número de versión
+        script: |
+          ULTIMO=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" || echo 0)
+          cd ios/App && agvtool new-version -all $((ULTIMO + 1))
+      - name: Crear la app (.ipa)
+        script: xcode-project build-ipa --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: false # solo pruebas internas (no hace falta revisión de Apple)

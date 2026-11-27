@@ -58,3 +58,6 @@ export function crearCatalogo(puestos?: Record<string, string>): Bolsa[] {
 export function nombreCuerpo(cuerpo: string) {
   return CUERPOS[cuerpo] ?? 'Otros puestos específicos';
 }
+
+/** Nombre legible de un puesto leído de SIPRI (para mostrar lo que se ha leído). */
+export const CATALOGO_RESPALDO_NOMBRE = (puesto: string, oficial: string) => nombreLegible(oficial || puesto);

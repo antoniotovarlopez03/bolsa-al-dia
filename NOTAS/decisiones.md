@@ -5,6 +5,7 @@
 - 2026-11-24 — Gráficas en SVG propio (sin librería) y localStorage en vez de IndexedDB en v0.1: menos dependencias; perfil < 1 MB.
 - 2026-11-24 — Antonio elige repo **público** (sabiendo que se ve su usuario) y publicar en **Vercel** (como sus otras webs) en vez de Cloudflare.
 - 2026-11-24 — Antonio pide verde Junta y nada de emojis: iconos SVG propios. Para no parecer web oficial: "no oficial" visible y sin escudo ni logotipo de la Junta.
+- 2026-11-27 — App de tiendas (decidido con la clienta): localizador guardado SOLO en el móvil (llavero); al abrir la app se conecta a SIPRI y actualiza orden, situación y provincias (el número cambia en cualquier momento, no solo con adjudicaciones). SIN avisos de "has subido/bajado un puesto" (salud mental) y sin trabajo en segundo plano. Avisos solo de convocatoria, adjudicación y notas de SIPRI. Sin servidor que guarde contraseñas.
 - 2026-11-27 — Nuevo nombre: Bolsa Sur. Logo «Lista de clase». Notificaciones con el mismo sistema que Repasa FP.
 - 2026-11-26 — Sin colaborar con Radar Docente (decisión de Antonio): el histórico se construye desde la fuente oficial (`/sipri/normativa/historico`, ~477 convocatorias desde 2018), nunca copiando su web.
 - 2026-11-26 — Prioridad del cliente: app personal, que se actualice y notifique → app nativa (Antonio ya tiene cuentas Apple y Google) con acceso a SIPRI dentro de la app; credenciales solo en el móvil.

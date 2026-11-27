@@ -1,3 +1,5 @@
+import { ConectarSipri } from '../componentes/ConectarSipri';
+import { esAppNativa } from '../nativo';
 import { useState } from 'react';
 import { URL_SIPRI } from '../datos/catalogo';
 import { PROVINCIAS_AND, type BolsaSeguida, type Disponibilidad, type Perfil, type RegistroPosicion } from '../datos/tipos';
@@ -39,8 +41,10 @@ export default function MisBolsas({ perfil, datos, setPerfil }: Props) {
     <>
       <header className="cabecera">
         <h1>Mis bolsas</h1>
-        <p className="sub">Copia aquí los números que ves en tu consulta personal de SIPRI.</p>
+        <p className="sub">{esAppNativa() ? 'Tus números se leen de tu consulta personal de SIPRI.' : 'Copia aquí los números que ves en tu consulta personal de SIPRI.'}</p>
       </header>
+
+      <ConectarSipri perfil={perfil} setPerfil={setPerfil} />
 
       <div className="pildoras" role="tablist">
         {perfil.bolsas.map((s) => (

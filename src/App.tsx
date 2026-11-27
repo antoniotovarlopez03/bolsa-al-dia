@@ -79,7 +79,7 @@ export default function App() {
       <main className="contenido">
         {datos ? (
           <>
-            {pestana === 'inicio' && <Inicio perfil={perfil} datos={datos} irA={irA} />}
+            {pestana === 'inicio' && <Inicio perfil={perfil} datos={datos} irA={irA} setPerfil={setPerfil} />}
             {pestana === 'bolsas' && <MisBolsas perfil={perfil} datos={datos} setPerfil={setPerfil} />}
             {pestana === 'sipri' && <Sipri perfil={perfil} datos={datos} seccion={seccion} setSeccion={setSeccion} />}
           </>

@@ -1,3 +1,4 @@
+import { ConectarSipri } from '../componentes/ConectarSipri';
 import { TarjetaAvisos } from '../componentes/TarjetaAvisos';
 import type { Pestana, SeccionSipri } from '../App';
 import type { Perfil } from '../datos/tipos';
@@ -22,9 +23,10 @@ interface Props {
   perfil: Perfil;
   datos: Datos;
   irA: (p: Pestana, s?: SeccionSipri) => void;
+  setPerfil: (p: Perfil) => void;
 }
 
-export default function Inicio({ perfil, datos, irA }: Props) {
+export default function Inicio({ perfil, datos, irA, setPerfil }: Props) {
   const convConvocados = ultimaCon(datos.convocatorias, 'convocados');
   const convPlazas = ultimaCon(datos.convocatorias, 'plazas');
   const misPuestos = perfil.bolsas.map((b) => puestoDe(b.bolsaId));
@@ -36,6 +38,8 @@ export default function Inicio({ perfil, datos, irA }: Props) {
         <h1>{saludo()}{perfil.nombre ? `, ${perfil.nombre}` : ''}</h1>
         <p className="sub">Así están tus bolsas hoy.</p>
       </header>
+
+      <ConectarSipri perfil={perfil} setPerfil={setPerfil} />
 
       <section aria-labelledby="t-bolsas">
         <h2 id="t-bolsas">Mis bolsas</h2>

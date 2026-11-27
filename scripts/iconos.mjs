@@ -37,3 +37,11 @@ for (const [archivo, tam, redondeado, escala] of salidas) {
 // Versión vectorial para el navegador.
 await writeFile('public/icono.svg', svg({ redondeado: true, escala: 0.92 }).toString() + '\n');
 console.log('✔ public/icono.svg');
+
+// Icono de la app de iPhone (1024×1024, sin esquinas: iOS las redondea). Solo si existe el proyecto ios/.
+import { existsSync } from 'node:fs';
+const RUTA_IOS = 'ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png';
+if (existsSync(RUTA_IOS)) {
+  await writeFile(RUTA_IOS, await sharp(svg({ redondeado: false, escala: 0.85 })).resize(1024, 1024).flatten({ background: VERDE }).png().toBuffer());
+  console.log('✔', RUTA_IOS);
+}

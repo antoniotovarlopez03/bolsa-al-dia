@@ -1,9 +1,11 @@
 // Carga los datos públicos que genera el robot (public/datos/and/).
 // El service worker los guarda para poder verlos sin conexión.
+import { BASE_DATOS } from '../nativo';
 import { useEffect, useState } from 'react';
 import type { Convocatoria, DetalleConvocatoria, Indice, NotaSipri } from './tipos';
 
-const RUTA = '/datos/and/';
+// En la app de iPhone/Android los datos se piden a la web publicada.
+const RUTA = BASE_DATOS() + '/datos/and/';
 /** Cuántas convocatorias recientes se descargan (≈ 2 meses). Limita datos móviles. */
 export const MAX_CONVOCATORIAS = 16;
 

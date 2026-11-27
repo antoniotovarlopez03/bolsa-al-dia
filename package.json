@@ -10,14 +10,20 @@
     "preview": "vite preview",
     "robot": "node robot/sipri.mjs",
     "test:robot": "node --test robot/procesar.test.mjs",
+    "test:sipri": "node --test robot/prueba-leer-sipri.mjs",
     "iconos": "node scripts/iconos.mjs"
   },
   "dependencies": {
+    "@capacitor/core": "^7.6.11",
+    "@capacitor/ios": "^7.6.11",
+    "@capacitor/preferences": "^7.0.4",
+    "cordova-plugin-inappbrowser": "^6.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "web-push": "^3.6.7"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.6.11",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@types/web-push": "^3.6.4",

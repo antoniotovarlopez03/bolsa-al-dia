@@ -1,5 +1,6 @@
 // Avisos (notificaciones web) en el navegador. Sin cuentas: el navegador da un "buzón" anónimo
 // y se guarda junto con las especialidades y provincias elegidas, nada más.
+import { esAppNativa } from './nativo';
 import type { Perfil } from './datos/tipos';
 
 export type TipoAviso = 'convocatoria' | 'adjudicacion' | 'notas';
@@ -56,6 +57,8 @@ async function suscripcionActual() {
 }
 
 export async function estadoAvisos(): Promise<EstadoAvisos> {
+  // En la app de iPhone los avisos irán por el sistema de Apple (próxima versión).
+  if (esAppNativa()) return { tipo: 'no-disponible' };
   if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window))
     return esIOS() && !instalada() ? { tipo: 'iphone-instalar' } : { tipo: 'no-soportado' };
   if (esIOS() && !instalada()) return { tipo: 'iphone-instalar' };
