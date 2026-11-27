@@ -1,13 +1,13 @@
 # Bolsa Sur · Cómo activar los avisos (notificaciones)
 
-Coste: **0 €**. Todo con planes gratuitos y sin tarjeta. Mismo sistema que Repasa FP.
+Coste: **0 €**. Todo con planes gratuitos y sin tarjeta. Mismo sistema de avisos que Repasa FP; las suscripciones se guardan en Upstash Redis (gratis, desde Vercel).
 
 ## Cómo funciona
 
 ```
 Robot (GitHub)  ──detecta novedad en SIPRI──►  /api/avisar (Vercel)  ──►  avisos a los móviles suscritos
                                                      │
-                                         Supabase: lista de suscripciones
+                                         Upstash Redis: lista de suscripciones
                                          (buzón anónimo + especialidades + provincias)
 ```
 
@@ -21,12 +21,10 @@ Robot (GitHub)  ──detecta novedad en SIPRI──►  /api/avisar (Vercel)  �
 
 Las claves las copias y pegas tú. Nunca me las pases por el chat.
 
-### 1. Supabase (guardar las suscripciones)
-1. Entra en https://supabase.com con tu cuenta → **New project** → nombre `bolsa-sur`, región *West EU*, plan **Free**.
-2. Cuando termine de crearse: menú **SQL Editor** → pega el contenido de `supabase/migraciones/001-suscripciones.sql` → **Run**.
-3. Menú **Project Settings → API**: necesitarás:
-   - **Project URL** → será `SUPABASE_URL`
-   - **service_role** (clave secreta) → será `SUPABASE_SERVICE_ROLE_KEY`
+### 1. Upstash Redis (guardar las suscripciones)
+1. Vercel → proyecto **bolsa-al-dia** → pestaña **Storage** → **Create Database** → **Upstash for Redis** → plan **Free**, región Frankfurt.
+2. Nombre `bolsa-sur-avisos` → **Create** → **Connect Project** → elige `bolsa-al-dia` (entornos Production, Preview y Development).
+3. Vercel añade solas las variables `KV_REST_API_URL` y `KV_REST_API_TOKEN`: no hay que copiar nada.
 
 ### 2. Claves de avisos (VAPID)
 En la terminal de Visual Studio Code, dentro de la carpeta del proyecto:
@@ -43,8 +41,8 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 Copia el resultado: será `AVISOS_SECRET` (se pone en Vercel **y** en GitHub, el mismo valor).
 
 ### 4. Vercel
-Proyecto **bolsa-al-dia** → **Settings → Environment Variables** → añade estas 5 (entorno *Production*):
-`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `AVISOS_SECRET`.
+Proyecto **bolsa-al-dia** → **Settings → Environment Variables** → añade estas 3 (entorno *Production*):
+`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `AVISOS_SECRET`.
 Después: **Deployments → … → Redeploy** (para que lea las variables).
 
 ### 5. GitHub
@@ -60,7 +58,7 @@ nombre `AVISOS_SECRET`, valor el mismo del paso 3.
 
 | Servicio | Límite gratuito | Si se supera |
 |---|---|---|
-| Supabase Free | 500 MB de base de datos (millones de suscripciones) | Se pausa si no hay actividad 7 días; el robot la usa cada semana |
+| Upstash Redis Free | 256 MB y 500.000 comandos/mes (cada aviso masivo es 1 lectura) | Se detiene hasta el mes siguiente; nunca cobra sin tarjeta |
 | Vercel Hobby | Funciones con límite de tiempo | Con muchísimos usuarios habría que repartir el envío en tandas |
 | GitHub Actions | Gratis (repositorio público) | Las ejecuciones programadas pueden retrasarse algunos minutos |
 | Avisos web | Gratis (los entregan Google/Apple/Mozilla) | — |

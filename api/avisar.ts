@@ -1,7 +1,9 @@
 // POST /api/avisar — lo llama SOLO el robot cuando detecta novedades en SIPRI.
 // Protegido con un secreto compartido (variable AVISOS_SECRET en Vercel y en GitHub).
 // Envía a cada suscripción un único aviso con lo que le interesa (sus especialidades y provincias).
-import { avisosConfigurados, configurarWebPush, json, supabase, type Suscripcion } from './_comun.js';
+import {
+  avisosConfigurados, borrarSuscripcion, configurarWebPush, json, todasLasSuscripciones, type Suscripcion,
+} from './_comun.js';
 
 interface FilaPlazas { puesto: string; provincia: string; plazas: number }
 type Evento =
@@ -41,17 +43,6 @@ export function componerAviso(s: Suscripcion, eventos: Evento[]) {
   return { titulo, cuerpo: partes.join(' '), url: '/' };
 }
 
-async function todasLasSuscripciones(): Promise<Suscripcion[]> {
-  const res: Suscripcion[] = [];
-  for (let desde = 0; desde < 100000; desde += 1000) {
-    const r = await supabase(`suscripciones?select=endpoint,p256dh,auth,puestos,provincias,tipos&order=endpoint&limit=1000&offset=${desde}`);
-    const lote = (await r.json()) as Suscripcion[];
-    res.push(...lote);
-    if (lote.length < 1000) break;
-  }
-  return res;
-}
-
 export async function POST(req: Request) {
   if (!process.env.AVISOS_SECRET || req.headers.get('x-avisos-secreto') !== process.env.AVISOS_SECRET)
     return json({ error: 'No autorizado' }, 401);
@@ -79,6 +70,6 @@ export async function POST(req: Request) {
       }),
     );
   }
-  for (const ep of caducadas) await supabase(`suscripciones?endpoint=eq.${encodeURIComponent(ep)}`, { method: 'DELETE' }).catch(() => {});
+  for (const ep of caducadas) await borrarSuscripcion(ep).catch(() => {});
   return json({ suscripciones: subs.length, enviados, caducadas: caducadas.length });
 }

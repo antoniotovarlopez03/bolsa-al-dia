@@ -22,13 +22,13 @@
 - **Decisiones del cliente** (26-11-2026): prioridad app de tiendas (Capacitor + Codemagic, como Repasa FP) con conexión a SIPRI dentro de la app y notificaciones. Sin buscador por nombre (RGPD). Sin colaborar con Radar Docente; histórico propio desde `/sipri/normativa/historico` (~477 convocatorias desde 2018). Antonio quiere probar antes la web.
 
 - **Nombre y logo** (27-11-2026, en local): la app pasa a llamarse **Bolsa Sur**; logo «Lista de clase» (cuaderno con tu fila resaltada en amarillo), iconos regenerados con `npm run iconos`. La clave de guardado local sigue siendo `bolsa-al-dia:` para no perder datos. La dirección web y el repositorio siguen como `bolsa-al-dia` (cambiarlos rompería los enlaces ya enviados).
-- **Notificaciones** (27-11-2026, código hecho en local, falta configurar claves): `api/suscribir.ts` y `api/avisar.ts` (funciones de Vercel), `public/sw-avisos.js`, `src/avisos.ts` y tarjeta "Avisos en el móvil" (Más e Inicio). Tabla `supabase/migraciones/001-suscripciones.sql`. El robot detecta convocatoria, adjudicación y notas nuevas y llama a `/api/avisar`; modo rápido cada 10 min mar/jue 9–15 h y lun 9–12 h (5 lecturas si no hay nada nuevo). Botón "aviso de prueba" en GitHub Actions. Pasos para Antonio: `docs/02-avisos-configuracion.md`.
+- **Notificaciones** (27-11-2026, código hecho en local, falta configurar claves): `api/suscribir.ts` y `api/avisar.ts` (funciones de Vercel), `public/sw-avisos.js`, `src/avisos.ts` y tarjeta "Avisos en el móvil" (Más e Inicio). Suscripciones en Upstash Redis (Vercel Storage, gratis; Supabase gratis ya tenía 2 proyectos: Pulso y Repasa). El robot detecta convocatoria, adjudicación y notas nuevas y llama a `/api/avisar`; modo rápido cada 10 min mar/jue 9–15 h y lun 9–12 h (5 lecturas si no hay nada nuevo). Botón "aviso de prueba" en GitHub Actions. Pasos para Antonio: `docs/02-avisos-configuracion.md`.
 
 ## Pendiente
 1. Corregir errata en la descripción del repo de GitHub ("Andaucía").
 2. Vigilar que el robot termina bien en GitHub (corrección subida y probada el 26-11).
 3. Páginas de privacidad/aviso legal con contacto genérico.
-4. Configurar los avisos (Antonio): Supabase, claves VAPID y AVISOS_SECRET en Vercel y GitHub — ver docs/02-avisos-configuracion.md. Después probar con el botón de aviso de prueba.
+4. Configurar los avisos (Antonio): Upstash en Vercel Storage, claves VAPID y AVISOS_SECRET en Vercel y GitHub — ver docs/02-avisos-configuracion.md. Después probar con el botón de aviso de prueba.
 5. Fase 6: pruebas en Android, iPhone y ordenador reales.
 6. Más adelante: fichero de series por especialidad si el histórico crece mucho (ahora se cargan las 16 últimas convocatorias).
 
