@@ -1,3 +1,4 @@
+import { TarjetaAvisos } from '../componentes/TarjetaAvisos';
 import { useRef, useState } from 'react';
 import { borrarTodo, exportarPerfil, importarPerfil } from '../almacen';
 import { URL_SIPRI } from '../datos/catalogo';
@@ -42,11 +43,8 @@ export default function Mas({ perfil, catalogo, setPerfil, editarPerfil }: Props
         <button className="boton" onClick={editarPerfil}>Cambiar especialidades y provincias</button>
       </section>
 
-      <section className="tarjeta">
-        <h2>Avisos</h2>
-        <p>Próximamente: un canal gratuito de Telegram con las novedades de cada convocatoria.</p>
-        <p className="nota">SIPRI ya te avisa por correo o SMS si te convocan. Revisa tu correo no deseado.</p>
-      </section>
+      <TarjetaAvisos perfil={perfil} />
+      <p className="nota">SIPRI también avisa por correo o SMS a quien convoca. Revisa tu correo no deseado.</p>
 
       <section className="tarjeta">
         <h2>Copia de seguridad</h2>

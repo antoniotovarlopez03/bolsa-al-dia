@@ -1,3 +1,4 @@
+import { actualizarAvisos } from './avisos';
 import { useMemo, useState } from 'react';
 import { cargarPerfil, guardarPerfil } from './almacen';
 import { useDatosPublicos } from './datos/cargar';
@@ -44,7 +45,10 @@ export default function App() {
 
   const setPerfil = (p: Perfil | null) => {
     setPerfilEstado(p);
-    if (p) guardarPerfil(p);
+    if (p) {
+      guardarPerfil(p);
+      actualizarAvisos(p); // si tiene avisos activos, actualiza especialidades y provincias
+    }
   };
 
   const irA = (p: Pestana, s?: SeccionSipri) => {

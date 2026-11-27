@@ -9,6 +9,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icono.svg', 'favicon-32.png', 'apple-touch-icon.png'],
       workbox: {
+        // Avisos: el service worker carga también public/sw-avisos.js (eventos push y clic).
+        importScripts: ['sw-avisos.js'],
+        navigateFallbackDenylist: [/^\/api\//],
         // Datos de SIPRI: se pide la versión nueva y, si no hay conexión, se usa la última guardada.
         runtimeCaching: [
           {

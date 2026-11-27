@@ -17,6 +17,12 @@ import {
 const puestosDesplegables = {};
 /** Páginas sin título de convocatoria en esta ejecución. */
 const paginasSinTitulo = [];
+/** Modo rápido: variable RAPIDO=true (la pone GitHub Actions en las revisiones frecuentes). */
+const RAPIDO = process.env.RAPIDO === 'true';
+let firmasPrevias = {};
+const firmasNuevas = {};
+/** Novedades detectadas en esta ejecución, para enviar los avisos. */
+const eventos = [];
 
 const BASE = 'https://sipri.juntadeandalucia.es/sipri/';
 const UA = 'Mozilla/5.0 (compatible; BolsaSur-robot/0.2; herramienta informativa gratuita y sin anuncios)';
@@ -82,6 +88,13 @@ async function leerListado(l) {
     paginasSinTitulo.push({ id: l.id, reconocido: Boolean(aviso) });
     return [];
   }
+  // Modo rápido (revisiones frecuentes en las franjas de publicación): si los títulos no han cambiado
+  // desde la última lectura completa, no se piden los datos. Así cada revisión son solo unas pocas lecturas.
+  const firmaTitulos = titulos.join('|');
+  if (RAPIDO && firmasPrevias[l.id] === firmaTitulos) {
+    console.log(`= ${l.id}: mismos títulos que en la última lectura (modo rápido)`);
+    return [];
+  }
   const res = [];
   for (let pos = 0; pos < titulos.length; pos++) {
     const filas = [];
@@ -104,6 +117,8 @@ async function leerListado(l) {
       throw new Error(`${l.id}: se esperaban ${total} filas y se leyeron ${filas.length}. Datos incompletos, no se guarda nada.`);
     res.push({ titulo: titulos[pos], fecha: fechaDeTitulo(titulos[pos]), filas });
   }
+  // Solo se recuerda la firma si todo estaba publicado (con filas); si no, se vuelve a leer la próxima vez.
+  if (res.every((c) => c.filas.length > 0)) firmasNuevas[l.id] = firmaTitulos;
   return res;
 }
 
@@ -116,7 +131,10 @@ async function main() {
   const rutaIndice = join(SALIDA, 'indice.json');
   const indice = await leerJSON(rutaIndice, { comunidad: 'AND', fuente: BASE, convocatorias: [], puestos: {} });
   const puestos = indice.puestos ?? {};
+  firmasPrevias = indice.firmas ?? {};
+  Object.assign(firmasNuevas, firmasPrevias);
   const ahora = new Date().toISOString();
+  if (RAPIDO) console.log('Modo rápido: solo se leen los datos si cambian los títulos.');
   const cambiadas = new Set();
   const detallesCambiados = new Set();
   const ficheros = new Map();
@@ -149,6 +167,18 @@ async function main() {
       // Las filas originales (con nombres) se descartan aquí: solo siguen el resumen y el detalle sin personas.
       c.filas.length = 0;
       if (mismaSeccion(doc.secciones[l.id], seccion)) { console.log(`= ${l.id} ${c.fecha}: sin cambios`); continue; }
+      // Primera vez que vemos este listado para esta convocatoria → hay que avisar.
+      if (!doc.secciones[l.id]) {
+        const filas = (seccion.filas ?? []).map(({ puesto, provincia, plazas }) => ({ puesto, provincia, plazas }));
+        if (l.id === 'plazas') {
+          const conv = doc.secciones.convocados?.porPuesto ?? {};
+          eventos.push({
+            tipo: 'convocatoria', fecha: c.fecha, plazas: filas,
+            convocados: Object.fromEntries(Object.entries(conv).map(([p, r]) => [p, r.convocados])),
+          });
+        }
+        if (l.id === 'adjudicados') eventos.push({ tipo: 'adjudicacion', fecha: c.fecha, adjudicados: filas });
+      }
       doc.secciones[l.id] = seccion;
       cambiadas.add(ruta);
       console.log(`✔ ${l.id} ${c.fecha}: ${seccion.total} filas resumidas`);
@@ -189,6 +219,10 @@ async function main() {
     const nuevas = novedadesDePortada(html);
     const rutaNov = join(SALIDA, 'novedades.json');
     const previo = await leerJSON(rutaNov, { notas: [] });
+    // Notas nuevas y recientes (últimos 3 días) → aviso.
+    const conocidas = new Set(previo.notas.map((n) => n.id));
+    const hace3dias = new Date(Date.now() - 3 * 86400000).toISOString();
+    for (const n of nuevas) if (!conocidas.has(n.id) && n.fecha >= hace3dias) eventos.push({ tipo: 'nota', titulo: n.titulo });
     const mapa = new Map([...previo.notas, ...nuevas].map((n) => [n.id, n]));
     const notas = [...mapa.values()].sort((a, b) => b.fecha.localeCompare(a.fecha)).slice(0, 40);
     if (JSON.stringify(notas) !== JSON.stringify(previo.notas)) {
@@ -211,13 +245,38 @@ async function main() {
   const puestosCambiados = Object.keys(nuevosPuestos).filter((c) => nuevosPuestos[c] !== indice.puestos?.[c]);
   if (firma(nuevosPuestos) !== firma(indice.puestos))
     console.log(`✔ catálogo: ${puestosCambiados.length} especialidades nuevas o renombradas (${puestosCambiados.slice(0, 5).join(', ')})`);
-  if (cambiadas.size || firma(nuevosPuestos) !== firma(indice.puestos)) {
-    indice.actualizado = ahora;
+  const firmasCambiadas = JSON.stringify(firmasNuevas) !== JSON.stringify(firmasPrevias);
+  if (cambiadas.size || firmasCambiadas || firma(nuevosPuestos) !== firma(indice.puestos)) {
+    if (cambiadas.size) indice.actualizado = ahora;
     indice.puestos = nuevosPuestos;
+    indice.firmas = firmasNuevas;
     comprobarSinDatosPersonales(indice);
     await writeFile(rutaIndice, JSON.stringify(indice, null, 1) + '\n');
   }
   console.log(`\nPeticiones a SIPRI: ${peticiones}. Resúmenes actualizados: ${cambiadas.size}. Detalles actualizados: ${detallesCambiados.size}.`);
+  await enviarAvisos();
+}
+
+/** Envía las novedades a la función /api/avisar de la web. Si falla, el robot no se detiene. */
+async function enviarAvisos() {
+  // Botón «aviso de prueba» de GitHub Actions: manda un aviso a todos los suscritos para comprobar que funciona.
+  if (process.env.AVISO_PRUEBA === 'true') eventos.push({ tipo: 'nota', titulo: 'Prueba: los avisos de Bolsa Sur funcionan' });
+  if (!eventos.length) return;
+  console.log(`Novedades para avisar: ${eventos.map((e) => e.tipo).join(', ')}`);
+  const url = process.env.AVISOS_URL, secreto = process.env.AVISOS_SECRET;
+  if (!url || !secreto) return console.log('(Avisos no configurados: no se envía nada.)');
+  try {
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-avisos-secreto': secreto },
+      body: JSON.stringify({ eventos }),
+      signal: AbortSignal.timeout(60000),
+    });
+    console.log(`Avisos: ${r.status} ${await r.text()}`);
+  } catch (e) {
+    console.warn(`⚠️ No se pudieron enviar los avisos: ${e.message}`);
+    if (process.env.GITHUB_ACTIONS) console.log(`::warning title=Avisos::${e.message}`);
+  }
 }
 
 main().catch((e) => {

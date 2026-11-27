@@ -1,3 +1,4 @@
+import { TarjetaAvisos } from '../componentes/TarjetaAvisos';
 import type { Pestana, SeccionSipri } from '../App';
 import type { Perfil } from '../datos/tipos';
 import { Aviso, Cambio, Fuente } from '../componentes/Comunes';
@@ -89,6 +90,8 @@ export default function Inicio({ perfil, datos, irA }: Props) {
           );
         })}
       </section>
+
+      <TarjetaAvisos perfil={perfil} compacta />
 
       {datos.novedades.length > 0 && (
         <section aria-labelledby="t-notas">

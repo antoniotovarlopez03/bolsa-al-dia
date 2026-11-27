@@ -308,3 +308,5 @@ svg { flex: none; }
 .nota-sipri:last-child { border-bottom: 0; }
 .nota-texto { font-size: .92rem; padding: 0 0 8px; }
 .nota-texto p { margin: 6px 0; }
+.tarjeta-aviso-activar { border: 1px solid var(--verde); background: var(--verde-tinte-2); }
+.tarjeta h2 svg { vertical-align: -3px; color: var(--verde); }
