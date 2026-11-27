@@ -46,7 +46,7 @@ workflows:
   # firma-android/ (scripts/firmar-android.mjs) y se sube a mano a Google Play Console.
   android-play:
     name: Bolsa Sur · Android (Google Play)
-    instance_type: linux_x2
+    instance_type: mac_mini_m2 # el plan gratis solo tiene esta máquina
     max_build_duration: 45
     environment:
       node: 22
