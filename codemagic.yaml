@@ -42,7 +42,8 @@ workflows:
         auth: integration
         submit_to_testflight: false # solo pruebas internas (no hace falta revisión de Apple)
 
-  # App de Android: genera el .aab firmado para subirlo a Google Play Console (a mano la primera vez).
+  # App de Android: genera el .aab SIN firmar. Se firma en el ordenador de Antonio con la llave de
+  # firma-android/ (scripts/firmar-android.mjs) y se sube a mano a Google Play Console.
   android-play:
     name: Bolsa Sur · Android (Google Play)
     instance_type: linux_x2
@@ -50,8 +51,6 @@ workflows:
     environment:
       node: 22
       java: 21
-      android_signing:
-        - bolsasur_subida # llave subida en Codemagic (Code signing identities → Android keystores)
     scripts:
       - name: Instalar paquetes
         script: npm ci
