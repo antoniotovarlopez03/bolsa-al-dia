@@ -3,3 +3,6 @@ dist
 dev-dist
 .env*
 *.log
+
+# Llave de firma de Android (NO subir a Git; hacer copia de seguridad)
+firma-android/

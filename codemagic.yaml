@@ -41,3 +41,25 @@ workflows:
       app_store_connect:
         auth: integration
         submit_to_testflight: false # solo pruebas internas (no hace falta revisión de Apple)
+
+  # App de Android: genera el .aab firmado para subirlo a Google Play Console (a mano la primera vez).
+  android-play:
+    name: Bolsa Sur · Android (Google Play)
+    instance_type: linux_x2
+    max_build_duration: 45
+    environment:
+      node: 22
+      java: 21
+      android_signing:
+        - bolsasur_subida # llave subida en Codemagic (Code signing identities → Android keystores)
+    scripts:
+      - name: Instalar paquetes
+        script: npm ci
+      - name: Compilar la web que va dentro de la app
+        script: npm run build
+      - name: Preparar el proyecto de Android
+        script: npx cap sync android
+      - name: Crear la app (.aab)
+        script: cd android && chmod +x gradlew && ./gradlew bundleRelease
+    artifacts:
+      - android/app/build/outputs/bundle/release/*.aab

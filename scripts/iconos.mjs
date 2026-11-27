@@ -45,3 +45,24 @@ if (existsSync(RUTA_IOS)) {
   await writeFile(RUTA_IOS, await sharp(svg({ redondeado: false, escala: 1.08 })).resize(1024, 1024).flatten({ background: MADERA }).png().toBuffer());
   console.log('✔', RUTA_IOS);
 }
+
+// Iconos de la app de Android (solo si existe el proyecto android/). Icono adaptable: fondo madera + pizarra.
+const RES = 'android/app/src/main/res';
+if (existsSync(RES)) {
+  const densidades = { mdpi: 1, hdpi: 1.5, xhdpi: 2, xxhdpi: 3, xxxhdpi: 4 };
+  // Primer plano sin fondo: Android recorta el icono (zona segura ≈ 61 % del lienzo).
+  const primerPlano = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <g transform="translate(256 256) scale(0.66) translate(-256 -256)">${pizarra()}</g></svg>`);
+  const redondo = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <circle cx="256" cy="256" r="256" fill="${MADERA}"/>
+  <g transform="translate(256 256) scale(0.8) translate(-256 -256)">${pizarra()}</g></svg>`);
+  for (const [d, f] of Object.entries(densidades)) {
+    const dir = `${RES}/mipmap-${d}`;
+    await writeFile(`${dir}/ic_launcher.png`, await sharp(svg({ redondeado: true, escala: 1 })).resize(48 * f, 48 * f).png().toBuffer());
+    await writeFile(`${dir}/ic_launcher_round.png`, await sharp(redondo).resize(48 * f, 48 * f).png().toBuffer());
+    await writeFile(`${dir}/ic_launcher_foreground.png`, await sharp(primerPlano).resize(108 * f, 108 * f).png().toBuffer());
+  }
+  await writeFile(`${RES}/values/ic_launcher_background.xml`,
+    `<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">${MADERA}</color>\n</resources>\n`);
+  console.log('✔ iconos de Android');
+}

@@ -11,3 +11,4 @@
 - 2026-11-26 — Prioridad del cliente: app personal, que se actualice y notifique → app nativa (Antonio ya tiene cuentas Apple y Google) con acceso a SIPRI dentro de la app; credenciales solo en el móvil.
 - 2026-11-24 — Fuente principal del robot: `POST /sipri/convocados/buscar` (JSON con `orden` por bolsa). El campo `apellidoNombreNif` se descarta al leer.
 - 2026-11-24 — No guardar nombres/NIF de los listados de SIPRI; solo cifras agregadas.
+- 28-11-2026: Excepción al coste 0 €: Antonio compra bolsasur.es (≈8,50 €/año) para correo y tiendas. Play bajo «AT Desarrollo Web»; App Store con su cuenta individual (como Repasa).

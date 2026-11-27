@@ -11,7 +11,7 @@ export default defineConfig({
       workbox: {
         // Avisos: el service worker carga también public/sw-avisos.js (eventos push y clic).
         importScripts: ['sw-avisos.js'],
-        navigateFallbackDenylist: [/^\/api\//],
+        navigateFallbackDenylist: [/^\/api\//, /^\/privacidad/],
         // Datos de SIPRI: se pide la versión nueva y, si no hay conexión, se usa la última guardada.
         runtimeCaching: [
           {

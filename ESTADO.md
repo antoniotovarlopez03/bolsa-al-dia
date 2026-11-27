@@ -25,6 +25,7 @@
 - **Notificaciones** (27-11-2026, código hecho en local, falta configurar claves): `api/suscribir.ts` y `api/avisar.ts` (funciones de Vercel), `public/sw-avisos.js`, `src/avisos.ts` y tarjeta "Avisos en el móvil" (Más e Inicio). Suscripciones en Upstash Redis (Vercel Storage, gratis; Supabase gratis ya tenía 2 proyectos: Pulso y Repasa). El robot detecta convocatoria, adjudicación y notas nuevas y llama a `/api/avisar`; modo rápido cada 10 min mar/jue 9–15 h y lun 9–12 h (5 lecturas si no hay nada nuevo). Botón "aviso de prueba" en GitHub Actions. Pasos para Antonio: `docs/02-avisos-configuracion.md`.
 
 - **App de iPhone (prueba técnica)** (27-11-2026, subida): App ID `es.bolsasur.app` registrado (con Push) y app "Bolsa Sur" creada en App Store Connect (Apple ID 6840082105). Capacitor 7 + carpeta `ios/` (bundle `es.bolsasur.app`), botón "Actualizar desde SIPRI" (navegador interno `cordova-plugin-inappbrowser`; `src/sipri/leer.ts` lee orden, situación y provincias en el móvil; pruebas `npm run test:sipri`). `codemagic.yaml` como Repasa FP (TestFlight interno). Pasos con Apple y Codemagic: `docs/03-app-iphone.md`.
+  - 27-11: perfil de firma «Bolsa Sur App Store» (Apple) cargado en Codemagic (`bolsasur_app_store`, mismo certificado que Repasa). Build #2 correcta (versión 1.0 (1)) subida a TestFlight; grupo interno «Equipo Bolsa Sur» con Antonio y distribución automática. Logo cambiado a «Pizarra» (web, iconos e iPhone). `Info.plist` con `ITSAppUsesNonExemptEncryption=false` (sin pregunta de cifrado en próximas builds).
 
 ## Pendiente
 1. Corregir errata en la descripción del repo de GitHub ("Andaucía").
@@ -36,3 +37,5 @@
 
 ## Para retomar
 `npm install`, `npm run dev` → http://localhost:5173. Leer `CLAUDE.md`. `npm run robot` hace ≈10 lecturas reales a SIPRI: usar con moderación.
+  - 28-11: dominio **bolsasur.es** (OVH, 7,25 € 1.er año, renueva 6,99 €+IVA). Vercel: www.bolsasur.es principal, bolsasur.es → 308 www; bolsa-al-dia.vercel.app sigue igual (la app nativa y avisos la usan). DNS OVH: A @ 216.198.79.1, CNAME www → 9915f9c383c9e2e6.vercel-dns-017.com; MX/SPF de OVH intactos. Pendiente que Red.es publique el .es (horas) y añadir bolsasur.es a Zimbra (daba «recently created, retry») para crear hola@bolsasur.es (contraseña la pone Antonio).
+  - 28-11: `/privacidad` (public/privacidad.html, vercel.json cleanUrls) enlazada en Más. Android: Capacitor android/ (es.bolsasur.app, iconos pizarra adaptables), firma en `firma-android/` (fuera de Git, contraseña en LEEME.txt: hacer copia), workflow Codemagic `android-play` (.aab; falta subir la llave a Codemagic como `bolsasur_subida`). Play: cuenta «AT Desarrollo Web» (personal → prueba cerrada 12 testers × 14 días).

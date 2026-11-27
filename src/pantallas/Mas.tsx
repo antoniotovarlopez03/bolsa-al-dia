@@ -66,6 +66,10 @@ export default function Mas({ perfil, catalogo, setPerfil, editarPerfil }: Props
           <li>Los listados de SIPRI incluyen nombres: <strong>no los guardamos ni los mostramos</strong>, solo cifras.</li>
           <li>Sin publicidad y sin cookies de seguimiento.</li>
         </ul>
+        <p className="nota">
+          Todos los detalles en la <a href="/privacidad.html" target="_blank" rel="noopener noreferrer">política de privacidad y aviso legal</a>.
+          Contacto: <a href="mailto:hola@bolsasur.es">hola@bolsasur.es</a>.
+        </p>
         <button className="boton peligro" onClick={borrar}>Borrar todos mis datos</button>
       </section>
 
