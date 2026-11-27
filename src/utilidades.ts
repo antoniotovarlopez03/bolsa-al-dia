@@ -89,3 +89,30 @@ export function descargarICS(eventos: EventoCalendario[]) {
   a.click();
   URL.revokeObjectURL(a.href);
 }
+
+export interface AvanceMes {
+  mes: string; // AAAA-MM
+  desde: number; // valor al empezar el mes (último del mes anterior, o primero del mes)
+  hasta: number; // último valor del mes
+  avance: number; // desde - hasta: positivo = has subido puestos (tienes menos gente delante)
+}
+
+/** Avance mes a mes de un valor (situación general o de una provincia), de más reciente a más antiguo. */
+export function avancePorMes(regs: RegistroPosicion[], valor: LectorValor): AvanceMes[] {
+  const v = regs
+    .filter((r) => valor(r) !== undefined)
+    .sort((a, b) => a.fecha.localeCompare(b.fecha))
+    .map((r) => ({ mes: r.fecha.slice(0, 7), n: valor(r)! }));
+  const meses = [...new Set(v.map((x) => x.mes))];
+  const res: AvanceMes[] = [];
+  meses.forEach((mes, i) => {
+    const delMes = v.filter((x) => x.mes === mes);
+    const anterior = i > 0 ? v.filter((x) => x.mes === meses[i - 1]).at(-1)!.n : delMes[0].n;
+    const hasta = delMes.at(-1)!.n;
+    res.push({ mes, desde: anterior, hasta, avance: anterior - hasta });
+  });
+  return res.reverse();
+}
+
+export const nombreMes = (aaaamm: string) =>
+  new Date(`${aaaamm}-15T12:00:00`).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });

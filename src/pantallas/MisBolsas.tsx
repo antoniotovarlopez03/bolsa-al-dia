@@ -10,7 +10,8 @@ import { Icono } from '../componentes/Iconos';
 import { ListaPlazas } from '../componentes/ListaPlazas';
 import { useDetalle } from '../datos/cargar';
 import {
-  type Datos, fechaCorta, hoyISO, num, puestoDe, serie, sumarPlazas, ultimaCon, ultimosDos, valorOrden, valorProvincia,
+  type Datos, avancePorMes, fechaCorta, hoyISO, nombreMes, num, puestoDe, serie, sumarPlazas, ultimaCon, ultimosDos, valorOrden,
+  valorProvincia,
   valorSituacion,
 } from '../utilidades';
 
@@ -94,6 +95,7 @@ function DetalleBolsa({ s, datos, actualizar }: { s: BolsaSeguida; datos: Datos;
   // Provincias con algún número apuntado (para la gráfica y el historial).
   const provConDatos = PROVINCIAS_AND.filter((p) => regs.some((r) => r.porProvincia?.[p] !== undefined));
   const lectorSerie = serieVista === 'general' ? valorSituacion : valorProvincia(serieVista);
+  const mesesGeneral = avancePorMes(regs, valorSituacion);
 
   const borrarRegistro = (f: string) => actualizar((x) => ({ ...x, registros: x.registros.filter((g) => g.fecha !== f) }));
 
@@ -179,6 +181,42 @@ function DetalleBolsa({ s, datos, actualizar }: { s: BolsaSeguida; datos: Datos;
           puntos={serie(regs, lectorSerie)}
         />
       </section>
+
+      {mesesGeneral.length > 0 && (
+        <section className="tarjeta">
+          <h2>Avance por meses</h2>
+          {mesesGeneral[0].avance > 0 && (
+            <p className="destacado-mes">
+              En {nombreMes(mesesGeneral[0].mes).split(' ')[0]} has avanzado <strong>{num(mesesGeneral[0].avance)} {mesesGeneral[0].avance === 1 ? 'puesto' : 'puestos'}</strong>
+              {provConDatos.length > 0 && (() => {
+                const p = provConDatos.map((pr) => ({ pr, a: avancePorMes(regs, valorProvincia(pr)).find((m) => m.mes === mesesGeneral[0].mes)?.avance ?? 0 }))
+                  .filter((x) => x.a > 0).map((x) => `${x.a} en ${x.pr}`);
+                return p.length ? ` (${p.join(', ')})` : '';
+              })()}
+              .
+            </p>
+          )}
+          <div className="tabla-scroll">
+            <table className="tabla">
+              <thead>
+                <tr><th>Mes</th><th>General</th>{provConDatos.map((p) => <th key={p}>{p}</th>)}</tr>
+              </thead>
+              <tbody>
+                {mesesGeneral.map((m) => (
+                  <tr key={m.mes}>
+                    <td>{nombreMes(m.mes)}</td>
+                    <td><CeldaAvance a={m.avance} /></td>
+                    {provConDatos.map((p) => (
+                      <td key={p}><CeldaAvance a={avancePorMes(regs, valorProvincia(p)).find((x) => x.mes === m.mes)?.avance} /></td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="nota">Puestos que has subido cada mes según los números que apuntas. Cuantas más veces los apuntes, más exacto.</p>
+        </section>
+      )}
 
       {regs.length > 0 && (
         <section className="tarjeta">
@@ -290,5 +328,16 @@ function PlazasDeLaBolsa({ datos, puesto, provincias, listado, titulo }: {
       )}
       <Fuente fecha={conv.fecha} />
     </section>
+  );
+}
+
+/** "+24 ↑" verde si has avanzado; en rojo si tienes más gente delante. */
+function CeldaAvance({ a }: { a?: number }) {
+  if (a === undefined) return <span className="nota">—</span>;
+  if (a === 0) return <span className="nota">sin cambios</span>;
+  return (
+    <span className={`cambio ${a > 0 ? 'bueno' : 'malo'}`}>
+      {a > 0 ? `${num(a)} puestos más cerca` : `${num(-a)} puestos más lejos`}
+    </span>
   );
 }

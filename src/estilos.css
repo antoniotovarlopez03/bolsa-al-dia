@@ -310,3 +310,4 @@ svg { flex: none; }
 .nota-texto p { margin: 6px 0; }
 .tarjeta-aviso-activar { border: 1px solid var(--verde); background: var(--verde-tinte-2); }
 .tarjeta h2 svg { vertical-align: -3px; color: var(--verde); }
+.destacado-mes { background: var(--verde-tinte); border-radius: var(--radio-s); padding: 10px 12px; margin: 0 0 8px; }

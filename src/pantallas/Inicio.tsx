@@ -6,7 +6,7 @@ import { NotasSipri } from '../componentes/NotasSipri';
 import { ResumenConvocados } from '../componentes/ResumenBolsa';
 import { Icono, type NombreIcono } from '../componentes/Iconos';
 import {
-  type Datos, fechaCorta, fechaLarga, num, puestoDe, saludo, sumarPlazas, ultimaCon, ultimosDos, valorOrden, valorProvincia,
+  type Datos, avancePorMes, fechaCorta, fechaLarga, hoyISO, num, puestoDe, saludo, sumarPlazas, ultimaCon, ultimosDos, valorOrden, valorProvincia,
   valorSituacion,
 } from '../utilidades';
 import { PROVINCIAS_AND } from '../datos/tipos';
@@ -71,6 +71,12 @@ export default function Inicio({ perfil, datos, irA }: Props) {
                   ))}
                 </ul>
               )}
+              {(() => {
+                const m = avancePorMes(s.registros, valorSituacion)[0];
+                return m && m.mes === hoyISO().slice(0, 7) && m.avance > 0 ? (
+                  <p className="destacado-mes">Este mes has avanzado <strong>{num(m.avance)} {m.avance === 1 ? 'puesto' : 'puestos'}</strong>.</p>
+                ) : null;
+              })()}
               {ultimaFecha && <p className="nota">Apuntado por ti el {fechaCorta(ultimaFecha)}</p>}
               {s.disponibilidad === 'trabajando' && (
                 <Aviso tipo="info">
