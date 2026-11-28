@@ -6,3 +6,6 @@ dev-dist
 
 # Llave de firma de Android (NO subir a Git; hacer copia de seguridad)
 firma-android/
+
+# Imágenes generadas para las tiendas
+capturas/
