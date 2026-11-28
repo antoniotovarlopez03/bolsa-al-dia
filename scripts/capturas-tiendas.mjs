@@ -24,6 +24,8 @@ const perfil = {
 const tamanos = [
   ['play', 360, 640],
   ['iphone69', 440, 956],
+  ['iphone63', 402, 874],
+  ['ipad13', 1024, 1366, 2],
 ];
 const pantallas = [
   ['1-inicio', null],
@@ -34,10 +36,10 @@ const pantallas = [
 
 const b = await chromium.launch({ executablePath: CHROME });
 try {
-  for (const [nombre, w, h] of tamanos) {
+  for (const [nombre, w, h, escala = 3] of tamanos) {
     const dir = `capturas/${nombre}`;
     mkdirSync(dir, { recursive: true });
-    const ctx = await b.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, locale: 'es-ES', serviceWorkers: 'block' });
+    const ctx = await b.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: escala, isMobile: true, hasTouch: true, locale: 'es-ES', serviceWorkers: 'block' });
     await ctx.addInitScript((p) => localStorage.setItem('bolsa-al-dia:perfil', JSON.stringify(p)), perfil);
     const pag = await ctx.newPage();
     await pag.goto(BASE, { waitUntil: 'networkidle' });
